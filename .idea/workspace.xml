@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cd1d9a22-6fbc-424b-b632-d34c8fa25317" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/mvnw.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/mvnw.cmd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/java/com/rice/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/java/com/rice/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/java/com/rice/controller/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/java/com/rice/controller/CustomerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/java/com/rice/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/java/com/rice/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/resources/application-local.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/application-local.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/controller/AuthController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/controller/CustomerController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/controller/CustomerController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/AddressService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/AddressService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/AuthService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/AuthService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/OrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/OrderService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/ProductService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/classes/com/rice/service/ProductService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/surefire-reports/TEST-com.rice.RicebackendApplicationTests.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/surefire-reports/TEST-com.rice.RicebackendApplicationTests.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BACKEND/ricebackend/target/surefire-reports/com.rice.RicebackendApplicationTests.txt" beforeDir="false" afterPath="$PROJECT_DIR$/BACKEND/ricebackend/target/surefire-reports/com.rice.RicebackendApplicationTests.txt" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="80" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.247898236431213" />
+      <entry key="MS500" value="2.9296550451056595" />
+      <entry key="S2" value="5.26103384526645" />
+      <entry key="S5" value="6.205552609372291" />
+      <entry key="S10" value="6.583879063210414" />
+      <entry key="S30" value="6.857073375941737" />
+      <entry key="S60" value="6.981655944185162" />
+      <entry key="M2" value="8.336900400611473" />
+      <entry key="M5" value="26.99189836089394" />
+      <entry key="M10" value="63.976045822366665" />
+      <entry key="M15" value="88.96513384853147" />
+      <entry key="M30" value="125.70424939259969" />
+      <entry key="H1" value="150.1934080219646" />
+      <entry key="H2" value="164.36294143040325" />
+      <entry key="H4" value="171.98858826048715" />
+      <entry key="D1" value="178.6371334145595" />
+      <entry key="W1" value="179.80461682300376" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.2236092375145615" />
+      <entry key="MS500" value="2.8779878644309203" />
+      <entry key="S2" value="5.234902634051788" />
+      <entry key="S5" value="6.193408878369261" />
+      <entry key="S10" value="6.5774909774175505" />
+      <entry key="S30" value="6.854870141888503" />
+      <entry key="S60" value="6.9805367452026195" />
+      <entry key="M2" value="8.33622826927685" />
+      <entry key="M5" value="26.99091191710521" />
+      <entry key="M10" value="63.974787883624245" />
+      <entry key="M15" value="88.96393953095091" />
+      <entry key="M30" value="125.7033857183322" />
+      <entry key="H1" value="150.1928860897552" />
+      <entry key="H2" value="164.36265420766196" />
+      <entry key="H4" value="171.98843755741265" />
+      <entry key="D1" value="178.63710726449747" />
+      <entry key="W1" value="179.8046130613382" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3H53rR20b6bOmTChv6siAtJUGcG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.RicebackendApplication.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.RicebackendApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/pasun/OneDrive/Desktop/BACKEND/ricebackend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "to.speed.mode.migration.done": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.rice.email" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="RicebackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
+      <module name="ricebackend" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rice.RicebackendApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.rice.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.RicebackendApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-63390994e64e-intellij.indexing.shared.core-IU-262.8665.337" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.8665.337" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cd1d9a22-6fbc-424b-b632-d34c8fa25317" name="Changes" comment="" />
+      <created>1785144303160</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1785144303160</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
