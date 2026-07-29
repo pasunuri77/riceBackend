@@ -3,6 +3,7 @@ package com.rice.service;
 import com.rice.dto.auth.AuthResponse;
 import com.rice.dto.auth.EmailOtpRequest;
 import com.rice.dto.auth.LoginRequest;
+import com.rice.dto.auth.ProfileUpdateRequest;
 import com.rice.dto.auth.RegisterRequest;
 import com.rice.dto.auth.ResetPasswordRequest;
 import com.rice.dto.auth.UserResponse;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +96,23 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    private UserResponse toResponse(User user) {
+    @Transactional
+    public UserResponse updateProfile(User principalUser, ProfileUpdateRequest request) {
+        User user = userRepository.findById(principalUser.getId())
+                .orElseThrow(() -> ApiException.notFound("User not found"));
+        String email = emailOtpService.normalize(request.getEmail());
+
+        if (userRepository.existsByEmailAndIdNot(email, user.getId())) {
+            throw ApiException.conflict("An account with this email already exists");
+        }
+
+        user.setName(request.getFullName());
+        user.setEmail(email);
+        user.setPhone(request.getMobile());
+        return toResponse(userRepository.save(user));
+    }
+
+    public UserResponse toResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())

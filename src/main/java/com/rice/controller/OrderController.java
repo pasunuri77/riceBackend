@@ -2,6 +2,7 @@ package com.rice.controller;
 
 import com.rice.dto.order.OrderCreateRequest;
 import com.rice.dto.order.OrderResponse;
+import com.rice.dto.order.UpdateOrderStatusRequest;
 import com.rice.security.AppUserPrincipal;
 import com.rice.service.OrderService;
 import jakarta.validation.Valid;
@@ -34,5 +35,15 @@ public class OrderController {
     @GetMapping("/api/admin/orders")
     public List<OrderResponse> all() {
         return orderService.listAll();
+    }
+
+    @PatchMapping("/api/admin/orders/{id}/payment-status")
+    public OrderResponse updatePaymentStatus(@PathVariable String id, @Valid @RequestBody UpdateOrderStatusRequest request) {
+        return orderService.updatePaymentStatus(id, request.getStatus());
+    }
+
+    @PatchMapping("/api/admin/orders/{id}/delivery-status")
+    public OrderResponse updateDeliveryStatus(@PathVariable String id, @Valid @RequestBody UpdateOrderStatusRequest request) {
+        return orderService.updateDeliveryStatus(id, request.getStatus());
     }
 }

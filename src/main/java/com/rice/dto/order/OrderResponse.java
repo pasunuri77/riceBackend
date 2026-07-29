@@ -5,10 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-// Flattened shape matching the existing frontend Order display components
-// (Admin Orders table, User Orders list, Customer detail modal all expect a single
-// riceName/quantity/image per order, not a nested item list).
+// Keeps the original flattened fields for existing frontend components while
+// also exposing the complete item list for multi-item order displays.
 @Getter
 @Builder
 @AllArgsConstructor
@@ -25,4 +25,14 @@ public class OrderResponse {
     private String paymentStatus;
     private String deliveryStatus;
     private String date;
+    private List<ItemResponse> items;
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class ItemResponse {
+        private String name;
+        private Integer weight;
+        private Integer qty;
+    }
 }
