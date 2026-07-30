@@ -6,113 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="cd1d9a22-6fbc-424b-b632-d34c8fa25317" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/security/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/RicebackendApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/AddressController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/AuthController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/BrandController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/CategoryController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/CustomerController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/OrderController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/ProductController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/controller/ReviewController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/BrandResponse$BrandResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/BrandResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/CategoryResponse$CategoryResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/CategoryResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/ReviewResponse$ReviewResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/ReviewResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/address/AddressRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/address/AddressResponse$AddressResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/address/AddressResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/AuthResponse$AuthResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/AuthResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/EmailOtpRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/LoginRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/MessageResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/RegisterRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/ResetPasswordRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/UserResponse$UserResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/UserResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/auth/VerifyOtpRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/customer/CustomerResponse$CustomerResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/customer/CustomerResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/customer/UpdateStatusRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/order/OrderCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/order/OrderItemRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/order/OrderResponse$OrderResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/order/OrderResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/product/ProductRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/product/ProductResponse$ProductResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/dto/product/ProductResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/email/EmailService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/email/EmailServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Address$AddressBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Address.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Brand$BrandBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Brand.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Category$CategoryBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Category.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Order$OrderBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Order.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/OrderItem$OrderItemBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/OrderItem.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/OtpVerification$OtpVerificationBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/OtpVerification.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Product$ProductBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Product.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Review$ReviewBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/Review.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/User$UserBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/User.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/AddressType.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/DeliveryStatus.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/OtpPurpose.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/PaymentMethod.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/PaymentStatus.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/ProductStatus.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/Role.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/entity/enums/UserStatus.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/exception/ApiException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/exception/ErrorResponse$ErrorResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/exception/ErrorResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/exception/GlobalExceptionHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/AddressRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/BrandRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/CategoryRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/OrderItemRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/OrderRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/OtpVerificationRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/ProductRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/ReviewRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/repository/UserRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/security/AppUserDetailsService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/security/AppUserPrincipal.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/security/JwtAuthFilter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/security/JwtService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/security/SecurityConfig.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/AddressService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/AuthService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/BrandService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/CategoryService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/CustomerService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/EmailOtpService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/OrderService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/ProductService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/rice/service/ReviewService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.rice.RicebackendApplicationTests.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.rice.RicebackendApplicationTests.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/rice/RicebackendApplicationTests.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +17,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="87" />
+    <option name="cachedIndexableFilesCount" value="91" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">

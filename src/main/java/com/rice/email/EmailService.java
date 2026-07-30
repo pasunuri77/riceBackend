@@ -9,4 +9,10 @@ public interface EmailService {
     void sendPasswordResetOtp(
             String email,
             String otp);
+
+    void sendContactMessage(
+            String name,
+            String email,
+            String subject,
+            String message);
 }

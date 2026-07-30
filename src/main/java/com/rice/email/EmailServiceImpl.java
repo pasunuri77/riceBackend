@@ -26,6 +26,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.email.sender-email:pasunurisagar2001@gmail.com}")
     private String senderEmail;
 
+    @Value("${app.contact.support-email:${app.email.sender-email:pasunurisagar2001@gmail.com}}")
+    private String supportEmail;
+
     @Override
     public void sendPin(String email, String pin) {
         String html = """
@@ -74,18 +77,52 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, "Password Reset OTP", html);
     }
 
+    @Override
+    public void sendContactMessage(String name, String email, String subject, String message) {
+        String safeName = escapeHtml(name);
+        String safeEmail = escapeHtml(email);
+        String safeSubject = escapeHtml(subject);
+        String safeMessage = escapeHtml(message).replace("\n", "<br>");
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:640px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#b45309;color:white;padding:24px;">
+                            <h1 style="margin:0;font-size:22px;">New RiceBazaar Contact Message</h1>
+                            <p style="margin:8px 0 0;color:#ffedd5;">Submitted from the Contact Us page</p>
+                        </div>
+                        <div style="padding:28px;color:#111827;">
+                            <p><strong>Name:</strong> %s</p>
+                            <p><strong>Email:</strong> %s</p>
+                            <p><strong>Subject:</strong> %s</p>
+                            <div style="margin-top:24px;">
+                                <p style="margin-bottom:8px;"><strong>Message:</strong></p>
+                                <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:16px;line-height:24px;">%s</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName, safeEmail, safeSubject, safeMessage);
+        sendEmail(supportEmail, "RiceBazaar Contact: " + subject, html, name, email);
+    }
+
     private void sendEmail(String email, String subject, String html) {
+        sendEmail(email, subject, html, null, null);
+    }
+
+    private void sendEmail(String email, String subject, String html, String replyToName, String replyToEmail) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("api-key", apiKey);
 
-        Map<String, Object> body = Map.of(
-                "sender", Map.of("name", senderName, "email", senderEmail),
-                "to", List.of(Map.of("email", email)),
-                "subject", subject,
-                "htmlContent", html
-        );
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("sender", Map.of("name", senderName, "email", senderEmail));
+        body.put("to", List.of(Map.of("email", email)));
+        body.put("subject", subject);
+        body.put("htmlContent", html);
+        if (replyToEmail != null && !replyToEmail.isBlank()) {
+            body.put("replyTo", Map.of("name", replyToName, "email", replyToEmail));
+        }
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
@@ -97,7 +134,17 @@ public class EmailServiceImpl implements EmailService {
                     String.class
             );
         } catch (Exception e) {
-            throw ApiException.badRequest("Unable to send email OTP. Please try again later");
+            throw ApiException.badRequest("Unable to send email. Please try again later");
         }
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) return "";
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }
