@@ -32,6 +32,11 @@ public class OrderController {
         return orderService.create(principal.getUser(), request);
     }
 
+    @PatchMapping("/api/orders/{id}/cancel")
+    public OrderResponse cancel(@AuthenticationPrincipal AppUserPrincipal principal, @PathVariable String id) {
+        return orderService.cancel(id, principal.getUser());
+    }
+
     @GetMapping("/api/admin/orders")
     public List<OrderResponse> all() {
         return orderService.listAll();

@@ -62,6 +62,21 @@ public class OrderService {
     }
 
     @Transactional
+    public OrderResponse cancel(String displayId, User customer) {
+        Order order = find(parseDisplayId(displayId));
+        if (!order.getCustomer().getId().equals(customer.getId())) {
+            throw ApiException.forbidden("Order not found: " + displayId);
+        }
+        if (order.getDeliveryStatus() != DeliveryStatus.PENDING
+                && order.getDeliveryStatus() != DeliveryStatus.PROCESSING) {
+            throw ApiException.badRequest("Order can no longer be cancelled");
+        }
+
+        order.setDeliveryStatus(DeliveryStatus.CANCELLED);
+        return toResponse(orderRepository.save(order));
+    }
+
+    @Transactional
     public OrderResponse create(User customer, OrderCreateRequest req) {
         if (req.getItems() == null || req.getItems().isEmpty()) {
             throw ApiException.badRequest("Cannot place an order with no items");
