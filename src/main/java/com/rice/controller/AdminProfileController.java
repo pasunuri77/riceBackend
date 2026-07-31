@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/admin/profile")
 @RequiredArgsConstructor
-public class UserController {
+public class AdminProfileController {
 
     private final AuthService authService;
 
-    @PatchMapping("/me")
-    public UserResponse updateMe(Authentication authentication,
-                                 @Valid @RequestBody ProfileUpdateRequest request) {
+    @PatchMapping
+    public UserResponse updateProfile(Authentication authentication,
+                                      @Valid @RequestBody ProfileUpdateRequest request) {
         return authService.updateProfile(authentication.getName(), request);
     }
 }

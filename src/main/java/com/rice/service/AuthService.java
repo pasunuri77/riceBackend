@@ -100,6 +100,17 @@ public class AuthService {
     public UserResponse updateProfile(User principalUser, ProfileUpdateRequest request) {
         User user = userRepository.findById(principalUser.getId())
                 .orElseThrow(() -> ApiException.notFound("User not found"));
+        return updateProfileUser(user, request);
+    }
+
+    @Transactional
+    public UserResponse updateProfile(String authenticatedEmail, ProfileUpdateRequest request) {
+        User user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> ApiException.unauthorized("Please login again"));
+        return updateProfileUser(user, request);
+    }
+
+    private UserResponse updateProfileUser(User user, ProfileUpdateRequest request) {
         String email = emailOtpService.normalize(request.getEmail());
 
         if (userRepository.existsByEmailAndIdNot(email, user.getId())) {
