@@ -8,6 +8,7 @@ import com.rice.entity.StoreSettings;
 import com.rice.exception.ApiException;
 import com.rice.repository.StoreSettingsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,12 @@ public class StoreSettingsService {
 
     private final StoreSettingsRepository storeSettingsRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${store.delivery-charge:49}")
+    private BigDecimal defaultDeliveryCharge;
+
+    @Value("${store.free-delivery-threshold:999}")
+    private BigDecimal defaultFreeDeliveryThreshold;
 
     public StoreSettingsResponse get() {
         return toResponse(getOrCreate());
@@ -61,8 +68,8 @@ public class StoreSettingsService {
                 .phone("")
                 .email("")
                 .currency("INR")
-                .deliveryCharge(BigDecimal.ZERO)
-                .freeDeliveryThreshold(BigDecimal.ZERO)
+                .deliveryCharge(defaultMoney(defaultDeliveryCharge))
+                .freeDeliveryThreshold(defaultMoney(defaultFreeDeliveryThreshold))
                 .taxPercentage(BigDecimal.ZERO)
                 .businessHours(writeHours(defaultHours()))
                 .build();
