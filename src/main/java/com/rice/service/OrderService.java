@@ -6,6 +6,7 @@ import com.rice.dto.order.OrderResponse;
 import com.rice.entity.Order;
 import com.rice.entity.OrderItem;
 import com.rice.entity.Product;
+import com.rice.entity.StoreSettings;
 import com.rice.entity.User;
 import com.rice.entity.enums.PaymentMethod;
 import com.rice.entity.enums.PaymentStatus;
@@ -31,8 +32,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private static final BigDecimal FREE_DELIVERY_THRESHOLD = BigDecimal.valueOf(999);
-    private static final BigDecimal DELIVERY_CHARGE = BigDecimal.valueOf(49);
+    private final StoreSettingsService storeSettingsService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 
     public List<OrderResponse> listAll() {
@@ -85,8 +85,7 @@ public class OrderService {
         BigDecimal subtotal = req.getItems().stream()
                 .map(this::lineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal deliveryCharge = subtotal.compareTo(FREE_DELIVERY_THRESHOLD) > 0 || subtotal.compareTo(BigDecimal.ZERO) == 0
-                ? BigDecimal.ZERO : DELIVERY_CHARGE;
+        BigDecimal deliveryCharge = deliveryChargeFor(subtotal);
         BigDecimal total = subtotal.add(deliveryCharge);
 
         PaymentMethod method = parsePaymentMethod(req.getPaymentMethod());
@@ -120,6 +119,22 @@ public class OrderService {
         return item.getPricePerKg()
                 .multiply(BigDecimal.valueOf(item.getWeight()))
                 .multiply(BigDecimal.valueOf(item.getQty()));
+    }
+
+    private BigDecimal deliveryChargeFor(BigDecimal subtotal) {
+        if (subtotal.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        StoreSettings settings = storeSettingsService.current();
+        BigDecimal threshold = nonNegative(settings.getFreeDeliveryThreshold());
+        if (threshold.compareTo(BigDecimal.ZERO) > 0 && subtotal.compareTo(threshold) >= 0) {
+            return BigDecimal.ZERO;
+        }
+        return nonNegative(settings.getDeliveryCharge());
+    }
+
+    private BigDecimal nonNegative(BigDecimal value) {
+        return value == null || value.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : value;
     }
 
     private PaymentMethod parsePaymentMethod(String value) {

@@ -13,23 +13,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin/settings")
 @RequiredArgsConstructor
 public class StoreSettingsController {
 
     private final StoreSettingsService storeSettingsService;
 
-    @GetMapping
+    @GetMapping({"/api/settings", "/api/admin/settings"})
     public StoreSettingsResponse get() {
         return storeSettingsService.get();
     }
 
-    @PutMapping
+    @PutMapping("/api/admin/settings")
     public StoreSettingsResponse put(@Valid @RequestBody StoreSettingsRequest request) {
         return storeSettingsService.update(request);
     }
 
-    @PatchMapping
+    @PatchMapping("/api/admin/settings")
     public StoreSettingsResponse patch(@Valid @RequestBody StoreSettingsRequest request) {
         return storeSettingsService.update(request);
     }

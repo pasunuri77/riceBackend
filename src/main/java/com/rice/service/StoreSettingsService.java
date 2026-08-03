@@ -29,6 +29,10 @@ public class StoreSettingsService {
         return toResponse(getOrCreate());
     }
 
+    StoreSettings current() {
+        return getOrCreate();
+    }
+
     @Transactional
     public StoreSettingsResponse update(StoreSettingsRequest request) {
         StoreSettings settings = getOrCreate();
