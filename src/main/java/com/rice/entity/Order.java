@@ -38,7 +38,7 @@ public class Order {
     @Column(name = "coupon_code")
     private String couponCode;
 
-    @Column(name = "discount_amount", nullable = false)
+    @Column(name = "discount_amount")
     @Builder.Default
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
