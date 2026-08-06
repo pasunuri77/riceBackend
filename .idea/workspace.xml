@@ -5,9 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cd1d9a22-6fbc-424b-b632-d34c8fa25317" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

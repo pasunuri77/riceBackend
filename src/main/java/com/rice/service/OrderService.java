@@ -126,13 +126,18 @@ public class OrderService {
             Product product = productRepository.findByIdForUpdate(itemReq.getId()).orElseThrow(
                     () -> ApiException.badRequest("Product not found: " + itemReq.getId()));
             int qty = itemReq.getQty() == null ? 0 : itemReq.getQty();
+            int weight = itemReq.getWeight() == null ? 0 : itemReq.getWeight();
             if (qty <= 0) {
                 throw ApiException.badRequest("Order item quantity must be greater than zero");
             }
-            if (product.getStock() == null || product.getStock() < qty) {
+            if (weight <= 0) {
+                throw ApiException.badRequest("Order item weight must be specified");
+            }
+            int totalKg = weight * qty;
+            if (product.getStock() == null || product.getStock() < totalKg) {
                 throw ApiException.badRequest("Insufficient stock for product: " + product.getId());
             }
-            product.setStock(product.getStock() - qty);
+            product.setStock(product.getStock() - totalKg);
 
             OrderItem item = OrderItem.builder()
                     .order(order)
@@ -188,13 +193,15 @@ public class OrderService {
             Product product = productRepository.findByIdForUpdate(productId)
                     .orElseThrow(() -> ApiException.badRequest("Product not found: " + productId));
             int qty = item.getQty() == null ? 0 : item.getQty();
-            if (qty <= 0) {
+            int weightKg = item.getWeightKg() == null ? 0 : item.getWeightKg();
+            if (qty <= 0 || weightKg <= 0) {
                 continue;
             }
-            if (product.getStock() == null || product.getStock() < qty) {
+            int totalKg = weightKg * qty;
+            if (product.getStock() == null || product.getStock() < totalKg) {
                 throw ApiException.badRequest("Insufficient stock to restore order: " + product.getId());
             }
-            product.setStock(product.getStock() - qty);
+            product.setStock(product.getStock() - totalKg);
         }
     }
 
@@ -206,7 +213,12 @@ public class OrderService {
             String productId = item.getProduct().getId();
             Product product = productRepository.findByIdForUpdate(productId)
                     .orElseThrow(() -> ApiException.badRequest("Product not found: " + productId));
-            product.setStock((product.getStock() == null ? 0 : product.getStock()) + item.getQty());
+            int qty = item.getQty() == null ? 0 : item.getQty();
+            int weightKg = item.getWeightKg() == null ? 0 : item.getWeightKg();
+            if (qty <= 0 || weightKg <= 0) {
+                continue;
+            }
+            product.setStock((product.getStock() == null ? 0 : product.getStock()) + (weightKg * qty));
         }
     }
 
