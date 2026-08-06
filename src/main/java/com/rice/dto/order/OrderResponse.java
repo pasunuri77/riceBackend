@@ -21,8 +21,6 @@ public class OrderResponse {
     private String image;
     private String address;
     private String notes;
-    private String couponCode;
-    private BigDecimal discount;
     private String quantity;
     private BigDecimal amount;
     private String paymentStatus;

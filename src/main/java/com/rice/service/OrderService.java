@@ -14,7 +14,6 @@ import com.rice.entity.enums.DeliveryStatus;
 import com.rice.exception.ApiException;
 import com.rice.repository.OrderRepository;
 import com.rice.repository.ProductRepository;
-import com.rice.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final CouponService couponService;
     private final StoreSettingsService storeSettingsService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 
@@ -100,12 +98,7 @@ public class OrderService {
         StoreSettings settings = storeSettingsService.current();
         BigDecimal tax = subtotal.multiply(defaultMoney(settings.getTaxPercentage()))
                 .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
-        BigDecimal preDiscountTotal = subtotal.add(deliveryCharge).add(tax);
-        BigDecimal discount = BigDecimal.ZERO;
-        if (req.getCouponCode() != null && !req.getCouponCode().isBlank()) {
-            discount = couponService.calculateDiscount(req.getCouponCode(), preDiscountTotal);
-        }
-        BigDecimal total = preDiscountTotal.subtract(discount);
+        BigDecimal total = subtotal.add(deliveryCharge).add(tax);
         if (total.compareTo(BigDecimal.ZERO) < 0) {
             total = BigDecimal.ZERO;
         }
@@ -116,8 +109,6 @@ public class OrderService {
                 .customer(customer)
                 .addressSnapshot(req.getAddress())
                 .notes(req.getNotes())
-                .couponCode(req.getCouponCode())
-                .discountAmount(discount)
                 .paymentMethod(method)
                 .paymentStatus(method == PaymentMethod.COD ? PaymentStatus.PENDING : PaymentStatus.PAID)
                 .amount(total)
@@ -173,6 +164,10 @@ public class OrderService {
 
     private BigDecimal nonNegative(BigDecimal value) {
         return value == null || value.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : value;
+    }
+
+    private BigDecimal defaultMoney(BigDecimal value) {
+        return value == null ? BigDecimal.ZERO : value;
     }
 
     private boolean isAdmin(User user) {
