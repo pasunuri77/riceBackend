@@ -61,11 +61,16 @@ public class OrderService {
     @Transactional
     public OrderResponse updateDeliveryStatus(String displayId, String status) {
         Order order = find(parseDisplayId(displayId));
-        DeliveryStatus newStatus = parseDeliveryStatusValue(status);
-        if (order.getDeliveryStatus() != DeliveryStatus.CANCELLED && newStatus == DeliveryStatus.CANCELLED) {
+        DeliveryStatus previous = order.getDeliveryStatus();
+        DeliveryStatus next = parseDeliveryStatusValue(status);
+
+        if (previous != DeliveryStatus.CANCELLED && next == DeliveryStatus.CANCELLED) {
             restoreStock(order);
+        } else if (previous == DeliveryStatus.CANCELLED && next != DeliveryStatus.CANCELLED) {
+            decrementStock(order);
         }
-        order.setDeliveryStatus(newStatus);
+
+        order.setDeliveryStatus(next);
         return toResponse(orderRepository.save(order));
     }
 
@@ -174,12 +179,33 @@ public class OrderService {
         return user != null && user.getRole() != null && user.getRole().name().equalsIgnoreCase("ADMIN");
     }
 
+    private void decrementStock(Order order) {
+        for (OrderItem item : order.getItems()) {
+            if (item.getProduct() == null) {
+                continue;
+            }
+            String productId = item.getProduct().getId();
+            Product product = productRepository.findByIdForUpdate(productId)
+                    .orElseThrow(() -> ApiException.badRequest("Product not found: " + productId));
+            int qty = item.getQty() == null ? 0 : item.getQty();
+            if (qty <= 0) {
+                continue;
+            }
+            if (product.getStock() == null || product.getStock() < qty) {
+                throw ApiException.badRequest("Insufficient stock to restore order: " + product.getId());
+            }
+            product.setStock(product.getStock() - qty);
+        }
+    }
+
     private void restoreStock(Order order) {
         for (OrderItem item : order.getItems()) {
             if (item.getProduct() == null) {
                 continue;
             }
-            Product product = item.getProduct();
+            String productId = item.getProduct().getId();
+            Product product = productRepository.findByIdForUpdate(productId)
+                    .orElseThrow(() -> ApiException.badRequest("Product not found: " + productId));
             product.setStock((product.getStock() == null ? 0 : product.getStock()) + item.getQty());
         }
     }
