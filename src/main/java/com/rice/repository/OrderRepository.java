@@ -14,6 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllByOrderByCreatedAtDesc();
     long countByCustomerId(Long customerId);
     long countByDeliveryStatus(DeliveryStatus status);
+    boolean existsByCustomerIdAndItemsProductId(Long customerId, String productId);
 
     @Query("select coalesce(sum(o.amount), 0) from Order o where o.customer.id = :customerId")
     BigDecimal totalSpentByCustomer(@Param("customerId") Long customerId);

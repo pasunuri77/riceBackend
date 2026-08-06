@@ -77,6 +77,19 @@ public class ProductService {
         product.setMinOrder(req.getMinOrder());
         product.setMaxOrder(req.getMaxOrder());
         product.setImage(req.getImage());
+        product.setImages(req.getImages());
+        product.setSupplier(req.getSupplier());
+        product.setBatchNumber(req.getBatchNumber());
+        product.setLotNumber(req.getLotNumber());
+        product.setCostPrice(req.getCostPrice());
+        product.setNutritionFacts(req.getNutritionFacts());
+        product.setCookingInstructions(req.getCookingInstructions());
+        product.setAroma(req.getAroma());
+        product.setTexture(req.getTexture());
+        product.setRiceAge(req.getRiceAge());
+        product.setBrokenPercentage(req.getBrokenPercentage());
+        product.setShelfLife(req.getShelfLife());
+        product.setStorageInstructions(req.getStorageInstructions());
         product.setWeightOptions(req.getWeightOptions());
         product.setBadges(req.getBadges());
         product.setStatus("Inactive".equalsIgnoreCase(req.getStatus()) ? ProductStatus.INACTIVE : ProductStatus.ACTIVE);
@@ -118,6 +131,19 @@ public class ProductService {
                 .rating(p.getRating())
                 .reviews((int) reviewCount)
                 .image(p.getImage())
+                .images(p.getImages() == null ? List.of() : List.copyOf(p.getImages()))
+                .supplier(p.getSupplier())
+                .batchNumber(p.getBatchNumber())
+                .lotNumber(p.getLotNumber())
+                .costPrice(p.getCostPrice())
+                .nutritionFacts(p.getNutritionFacts())
+                .cookingInstructions(p.getCookingInstructions())
+                .aroma(p.getAroma())
+                .texture(p.getTexture())
+                .riceAge(p.getRiceAge())
+                .brokenPercentage(p.getBrokenPercentage())
+                .shelfLife(p.getShelfLife())
+                .storageInstructions(p.getStorageInstructions())
                 .status(p.getStatus() == ProductStatus.ACTIVE ? "Active" : "Inactive")
                 // force these lazy element collections to materialize now, while the
                 // transaction/session is still open - otherwise Jackson touches them

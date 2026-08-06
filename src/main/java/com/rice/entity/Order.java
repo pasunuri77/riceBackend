@@ -32,6 +32,9 @@ public class Order {
     @Column(name = "address_snapshot", columnDefinition = "text")
     private String addressSnapshot;
 
+    @Column(columnDefinition = "text")
+    private String notes;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;

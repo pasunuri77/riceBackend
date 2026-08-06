@@ -58,7 +58,26 @@ public class Product {
     @Column(columnDefinition = "text")
     private String description;
 
+    @ElementCollection
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url")
+    @Builder.Default
+    private List<String> images = new ArrayList<>();
+
     private String image;
+
+    private String supplier;
+    private String batchNumber;
+    private String lotNumber;
+    private BigDecimal costPrice;
+    private String nutritionFacts;
+    private String cookingInstructions;
+    private String aroma;
+    private String texture;
+    private String riceAge;
+    private Double brokenPercentage;
+    private String shelfLife;
+    private String storageInstructions;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default

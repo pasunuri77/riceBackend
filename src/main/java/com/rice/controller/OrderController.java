@@ -23,8 +23,8 @@ public class OrderController {
     }
 
     @GetMapping("/api/orders/{id}")
-    public OrderResponse getById(@PathVariable Long id) {
-        return orderService.getById(id);
+    public OrderResponse getById(@AuthenticationPrincipal AppUserPrincipal principal, @PathVariable Long id) {
+        return orderService.getById(id, principal.getUser());
     }
 
     @PostMapping("/api/orders")

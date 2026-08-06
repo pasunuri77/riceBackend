@@ -14,6 +14,7 @@ import com.rice.entity.enums.DeliveryStatus;
 import com.rice.exception.ApiException;
 import com.rice.repository.OrderRepository;
 import com.rice.repository.ProductRepository;
+import com.rice.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final CouponService couponService;
     private final StoreSettingsService storeSettingsService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 
@@ -43,8 +45,12 @@ public class OrderService {
         return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream().map(this::toResponse).toList();
     }
 
-    public OrderResponse getById(Long id) {
-        return toResponse(find(id));
+    public OrderResponse getById(Long id, User currentUser) {
+        Order order = find(id);
+        if (!isAdmin(currentUser) && !order.getCustomer().getId().equals(currentUser.getId())) {
+            throw ApiException.notFound("Order not found: " + id);
+        }
+        return toResponse(order);
     }
 
     @Transactional
@@ -57,7 +63,11 @@ public class OrderService {
     @Transactional
     public OrderResponse updateDeliveryStatus(String displayId, String status) {
         Order order = find(parseDisplayId(displayId));
-        order.setDeliveryStatus(parseDeliveryStatusValue(status));
+        DeliveryStatus newStatus = parseDeliveryStatusValue(status);
+        if (order.getDeliveryStatus() != DeliveryStatus.CANCELLED && newStatus == DeliveryStatus.CANCELLED) {
+            restoreStock(order);
+        }
+        order.setDeliveryStatus(newStatus);
         return toResponse(orderRepository.save(order));
     }
 
@@ -72,6 +82,7 @@ public class OrderService {
             throw ApiException.badRequest("Order can no longer be cancelled");
         }
 
+        restoreStock(order);
         order.setDeliveryStatus(DeliveryStatus.CANCELLED);
         return toResponse(orderRepository.save(order));
     }
@@ -86,27 +97,54 @@ public class OrderService {
                 .map(this::lineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal deliveryCharge = deliveryChargeFor(subtotal);
-        BigDecimal total = subtotal.add(deliveryCharge);
+        StoreSettings settings = storeSettingsService.current();
+        BigDecimal tax = subtotal.multiply(defaultMoney(settings.getTaxPercentage()))
+                .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+        BigDecimal preDiscountTotal = subtotal.add(deliveryCharge).add(tax);
+        BigDecimal discount = BigDecimal.ZERO;
+        if (req.getCouponCode() != null && !req.getCouponCode().isBlank()) {
+            discount = couponService.calculateDiscount(req.getCouponCode(), preDiscountTotal);
+        }
+        BigDecimal total = preDiscountTotal.subtract(discount);
+        if (total.compareTo(BigDecimal.ZERO) < 0) {
+            total = BigDecimal.ZERO;
+        }
 
         PaymentMethod method = parsePaymentMethod(req.getPaymentMethod());
 
         Order order = Order.builder()
                 .customer(customer)
                 .addressSnapshot(req.getAddress())
+                .notes(req.getNotes())
+                .couponCode(req.getCouponCode())
+                .discountAmount(discount)
                 .paymentMethod(method)
                 .paymentStatus(method == PaymentMethod.COD ? PaymentStatus.PENDING : PaymentStatus.PAID)
                 .amount(total)
                 .build();
 
         for (OrderItemRequest itemReq : req.getItems()) {
-            Product product = itemReq.getId() == null ? null : productRepository.findById(itemReq.getId()).orElse(null);
+            if (itemReq.getId() == null) {
+                throw ApiException.badRequest("Order item is missing product id");
+            }
+            Product product = productRepository.findByIdForUpdate(itemReq.getId()).orElseThrow(
+                    () -> ApiException.badRequest("Product not found: " + itemReq.getId()));
+            int qty = itemReq.getQty() == null ? 0 : itemReq.getQty();
+            if (qty <= 0) {
+                throw ApiException.badRequest("Order item quantity must be greater than zero");
+            }
+            if (product.getStock() == null || product.getStock() < qty) {
+                throw ApiException.badRequest("Insufficient stock for product: " + product.getId());
+            }
+            product.setStock(product.getStock() - qty);
+
             OrderItem item = OrderItem.builder()
                     .order(order)
                     .product(product)
                     .productNameSnapshot(itemReq.getName())
                     .imageSnapshot(itemReq.getImage())
                     .weightKg(itemReq.getWeight())
-                    .qty(itemReq.getQty())
+                    .qty(qty)
                     .pricePerKgSnapshot(itemReq.getPricePerKg())
                     .build();
             order.getItems().add(item);
@@ -135,6 +173,20 @@ public class OrderService {
 
     private BigDecimal nonNegative(BigDecimal value) {
         return value == null || value.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : value;
+    }
+
+    private boolean isAdmin(User user) {
+        return user != null && user.getRole() != null && user.getRole().name().equalsIgnoreCase("ADMIN");
+    }
+
+    private void restoreStock(Order order) {
+        for (OrderItem item : order.getItems()) {
+            if (item.getProduct() == null) {
+                continue;
+            }
+            Product product = item.getProduct();
+            product.setStock((product.getStock() == null ? 0 : product.getStock()) + item.getQty());
+        }
     }
 
     private PaymentMethod parsePaymentMethod(String value) {
