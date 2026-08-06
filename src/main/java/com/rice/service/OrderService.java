@@ -11,6 +11,7 @@ import com.rice.entity.User;
 import com.rice.entity.enums.PaymentMethod;
 import com.rice.entity.enums.PaymentStatus;
 import com.rice.entity.enums.DeliveryStatus;
+import com.rice.service.CouponService;
 import com.rice.exception.ApiException;
 import com.rice.repository.OrderRepository;
 import com.rice.repository.ProductRepository;
@@ -33,6 +34,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final StoreSettingsService storeSettingsService;
+    private final CouponService couponService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 
     public List<OrderResponse> listAll() {
@@ -103,7 +105,17 @@ public class OrderService {
         StoreSettings settings = storeSettingsService.current();
         BigDecimal tax = subtotal.multiply(defaultMoney(settings.getTaxPercentage()))
                 .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
-        BigDecimal total = subtotal.add(deliveryCharge).add(tax);
+
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        if (req.getCouponCode() != null && !req.getCouponCode().isBlank()) {
+            var validation = couponService.validateCoupon(req.getCouponCode(), subtotal);
+            if (!validation.isValid()) {
+                throw ApiException.badRequest(validation.getMessage());
+            }
+            discountAmount = validation.getDiscountAmount();
+        }
+
+        BigDecimal total = subtotal.subtract(discountAmount).add(deliveryCharge).add(tax);
         if (total.compareTo(BigDecimal.ZERO) < 0) {
             total = BigDecimal.ZERO;
         }
@@ -114,6 +126,8 @@ public class OrderService {
                 .customer(customer)
                 .addressSnapshot(req.getAddress())
                 .notes(req.getNotes())
+                .couponCode(req.getCouponCode() == null ? null : req.getCouponCode().trim().toUpperCase())
+                .discountAmount(discountAmount)
                 .paymentMethod(method)
                 .paymentStatus(method == PaymentMethod.COD ? PaymentStatus.PENDING : PaymentStatus.PAID)
                 .amount(total)
@@ -294,6 +308,9 @@ public class OrderService {
                 .riceName(riceName)
                 .image(image)
                 .address(o.getAddressSnapshot())
+                .notes(o.getNotes())
+                .couponCode(o.getCouponCode())
+                .discountAmount(o.getDiscountAmount())
                 .quantity(quantity)
                 .amount(o.getAmount())
                 .paymentStatus(capitalize(o.getPaymentStatus().name()))

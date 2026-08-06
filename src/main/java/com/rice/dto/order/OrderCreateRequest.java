@@ -11,6 +11,7 @@ import java.util.List;
 public class OrderCreateRequest {
     private String address;
     private String paymentMethod;
+    private String couponCode;
     private String notes;
 
     @NotEmpty
