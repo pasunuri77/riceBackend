@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import jakarta.persistence.LockModeType;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,10 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from Product p where p.id = :id")
     Optional<Product> findByIdForUpdate(@Param("id") String id);
+
+    @Query("select p from Product p where p.showInTodaysOffers = true and (p.offerEndDate is null or p.offerEndDate >= :now) order by p.displayPriority asc")
+    List<Product> findTodaysOffers(@Param("now") Instant now);
+
+    @Query("select p from Product p where p.showInTodaysOffers = true and p.offerEndDate < :now")
+    List<Product> findExpiredOffers(@Param("now") Instant now);
 }

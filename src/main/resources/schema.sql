@@ -3,6 +3,30 @@
 ALTER TABLE orders
     ADD COLUMN IF NOT EXISTS discount_amount numeric(38,2);
 
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS delay_flag boolean NOT NULL DEFAULT false;
+
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS delivery_charge numeric(38,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS offer_discount numeric(38,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS subtotal numeric(38,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS tax numeric(38,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE products
+    ADD COLUMN IF NOT EXISTS display_priority integer NOT NULL DEFAULT 0;
+
+ALTER TABLE products
+    ADD COLUMN IF NOT EXISTS show_in_todays_offers boolean NOT NULL DEFAULT false;
+
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS mobile_verified boolean NOT NULL DEFAULT false;
+
 UPDATE orders
     SET discount_amount = 0
     WHERE discount_amount IS NULL;

@@ -3,10 +3,13 @@ package com.rice.service;
 import com.rice.dto.auth.AuthResponse;
 import com.rice.dto.auth.EmailOtpRequest;
 import com.rice.dto.auth.LoginRequest;
+import com.rice.dto.auth.MessageResponse;
+import com.rice.dto.auth.MobileOtpRequest;
 import com.rice.dto.auth.ProfileUpdateRequest;
 import com.rice.dto.auth.RegisterRequest;
 import com.rice.dto.auth.ResetPasswordRequest;
 import com.rice.dto.auth.UserResponse;
+import com.rice.dto.auth.VerifyMobileOtpRequest;
 import com.rice.dto.auth.VerifyOtpRequest;
 import com.rice.entity.User;
 import com.rice.entity.enums.OtpPurpose;
@@ -16,6 +19,7 @@ import com.rice.repository.UserRepository;
 import com.rice.security.AppUserPrincipal;
 import com.rice.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +35,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final EmailOtpService emailOtpService;
+    private final TwilioVerifyService twilioVerifyService;
 
     public AuthResponse login(LoginRequest request) {
         String email = emailOtpService.normalize(request.getEmail());
@@ -60,6 +65,37 @@ public class AuthService {
         emailOtpService.verifyOtp(email, request.getOtp(), OtpPurpose.REGISTRATION);
     }
 
+    public MessageResponse sendMobileOtp(MobileOtpRequest request) {
+        String phone = twilioVerifyService.normalizePhoneNumber(request.getPhone());
+        if (userRepository.existsByPhone(phone)) {
+            throw ApiException.conflict("This mobile number is already registered");
+        }
+        twilioVerifyService.sendVerification(phone);
+        return new MessageResponse("OTP sent successfully");
+    }
+
+    public MessageResponse verifyMobileOtp(VerifyMobileOtpRequest request, Authentication authentication) {
+        String phone = twilioVerifyService.normalizePhoneNumber(request.getPhone());
+        if (userRepository.existsByPhone(phone) && authentication == null) {
+            throw ApiException.conflict("This mobile number is already registered");
+        }
+
+        boolean approved = twilioVerifyService.verifyCode(phone, request.getOtp());
+        if (!approved) {
+            throw ApiException.badRequest("Invalid or expired OTP");
+        }
+
+        if (authentication != null) {
+            User user = userRepository.findByEmail(authentication.getName())
+                    .orElseThrow(() -> ApiException.unauthorized("Please login again"));
+            user.setPhone(phone);
+            user.setMobileVerified(true);
+            userRepository.save(user);
+        }
+
+        return new MessageResponse("Mobile number verified successfully");
+    }
+
     public AuthResponse register(RegisterRequest request) {
         String email = emailOtpService.normalize(request.getEmail());
         if (userRepository.existsByEmail(email)) {
@@ -67,10 +103,16 @@ public class AuthService {
         }
         emailOtpService.consumeVerifiedOtp(email, OtpPurpose.REGISTRATION);
 
+        String phone = twilioVerifyService.normalizePhoneNumber(request.getMobile());
+        if (twilioVerifyService.isConfigured() && !twilioVerifyService.isPhoneVerified(phone)) {
+            throw ApiException.badRequest("Please verify your mobile number before completing registration");
+        }
+
         User user = User.builder()
                 .name(request.getFullName())
                 .email(email)
-                .phone(request.getMobile())
+                .phone(phone)
+                .mobileVerified(twilioVerifyService.isConfigured() && twilioVerifyService.isPhoneVerified(phone))
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
@@ -117,9 +159,13 @@ public class AuthService {
             throw ApiException.conflict("An account with this email already exists");
         }
 
+        String phone = twilioVerifyService.normalizePhoneNumber(request.getMobile());
         user.setName(request.getFullName());
         user.setEmail(email);
-        user.setPhone(request.getMobile());
+        if (!phone.equals(user.getPhone())) {
+            user.setMobileVerified(false);
+        }
+        user.setPhone(phone);
         return toResponse(userRepository.save(user));
     }
 
@@ -129,6 +175,7 @@ public class AuthService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .phone(user.getPhone())
+                .mobileVerified(user.isMobileVerified())
                 .role(user.getRole().name().toLowerCase())
                 .build();
     }

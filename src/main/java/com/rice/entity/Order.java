@@ -56,6 +56,35 @@ public class Order {
     @Builder.Default
     private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
 
+    @Column(name = "delivered_at")
+    private Instant deliveredAt;
+
+    @Column(name = "estimated_delivery_date")
+    private Instant estimatedDeliveryDate;
+
+    @Column(name = "delay_flag", nullable = false)
+    @Builder.Default
+    private boolean delayFlag = false;
+
+    @Column(name = "delivery_remarks", columnDefinition = "text")
+    private String deliveryRemarks;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private BigDecimal subtotal = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private BigDecimal tax = BigDecimal.ZERO;
+
+    @Column(name = "delivery_charge", nullable = false)
+    @Builder.Default
+    private BigDecimal deliveryCharge = BigDecimal.ZERO;
+
+    @Column(name = "offer_discount", nullable = false)
+    @Builder.Default
+    private BigDecimal offerDiscount = BigDecimal.ZERO;
+
     @Column(nullable = false)
     private BigDecimal amount;
 

@@ -2,6 +2,7 @@ package com.rice.controller;
 
 import com.rice.dto.order.OrderCreateRequest;
 import com.rice.dto.order.OrderResponse;
+import com.rice.dto.order.UpdateOrderDeliveryInfoRequest;
 import com.rice.dto.order.UpdateOrderStatusRequest;
 import com.rice.security.AppUserPrincipal;
 import com.rice.service.OrderService;
@@ -50,5 +51,10 @@ public class OrderController {
     @PatchMapping("/api/admin/orders/{id}/delivery-status")
     public OrderResponse updateDeliveryStatus(@PathVariable String id, @Valid @RequestBody UpdateOrderStatusRequest request) {
         return orderService.updateDeliveryStatus(id, request.getStatus());
+    }
+
+    @PatchMapping("/api/admin/orders/{id}/delivery-info")
+    public OrderResponse updateDeliveryInfo(@PathVariable String id, @Valid @RequestBody com.rice.dto.order.UpdateOrderDeliveryInfoRequest request) {
+        return orderService.updateDeliveryInfo(id, request);
     }
 }

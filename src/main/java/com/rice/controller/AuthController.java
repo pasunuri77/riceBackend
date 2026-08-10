@@ -4,12 +4,15 @@ import com.rice.dto.auth.AuthResponse;
 import com.rice.dto.auth.EmailOtpRequest;
 import com.rice.dto.auth.LoginRequest;
 import com.rice.dto.auth.MessageResponse;
+import com.rice.dto.auth.MobileOtpRequest;
 import com.rice.dto.auth.RegisterRequest;
 import com.rice.dto.auth.ResetPasswordRequest;
+import com.rice.dto.auth.VerifyMobileOtpRequest;
 import com.rice.dto.auth.VerifyOtpRequest;
 import com.rice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,6 +37,17 @@ public class AuthController {
     public MessageResponse verifyRegistrationOtp(@Valid @RequestBody VerifyOtpRequest request) {
         authService.verifyRegistrationOtp(request);
         return new MessageResponse("Email OTP verified");
+    }
+
+    @PostMapping("/send-mobile-otp")
+    public MessageResponse sendMobileOtp(@Valid @RequestBody MobileOtpRequest request) {
+        return authService.sendMobileOtp(request);
+    }
+
+    @PostMapping("/verify-mobile-otp")
+    public MessageResponse verifyMobileOtp(Authentication authentication,
+                                           @Valid @RequestBody VerifyMobileOtpRequest request) {
+        return authService.verifyMobileOtp(request, authentication);
     }
 
     @PostMapping("/register")

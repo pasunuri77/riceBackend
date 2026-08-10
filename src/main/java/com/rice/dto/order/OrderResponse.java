@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 // Keeps the original flattened fields for existing frontend components while
@@ -23,6 +24,14 @@ public class OrderResponse {
     private String notes;
     private String couponCode;
     private BigDecimal discountAmount;
+    private BigDecimal subtotal;
+    private BigDecimal tax;
+    private BigDecimal deliveryCharge;
+    private BigDecimal offerDiscount;
+    private Instant estimatedDeliveryDate;
+    private Instant deliveredAt;
+    private Boolean delayFlag;
+    private String deliveryRemarks;
     private String quantity;
     private BigDecimal amount;
     private String paymentStatus;
@@ -35,6 +44,7 @@ public class OrderResponse {
     @AllArgsConstructor
     public static class ItemResponse {
         private String name;
+        private BigDecimal pricePerKg;
         private Integer weight;
         private Integer qty;
     }

@@ -41,6 +41,20 @@ public class Product {
     @Column(name = "price_per_kg", nullable = false)
     private BigDecimal pricePerKg;
 
+    @Column(name = "show_in_todays_offers", nullable = false)
+    @Builder.Default
+    private boolean showInTodaysOffers = false;
+
+    @Column(name = "display_priority", nullable = false)
+    @Builder.Default
+    private Integer displayPriority = 0;
+
+    @Column(name = "offer_end_date")
+    private Instant offerEndDate;
+
+    @Column(name = "low_stock_threshold")
+    private Integer lowStockThreshold;
+
     private BigDecimal mrp;
 
     @Column(nullable = false)

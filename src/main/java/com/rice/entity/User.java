@@ -31,6 +31,10 @@ public class User {
 
     private String phone;
 
+    @Column(name = "mobile_verified", nullable = false)
+    @Builder.Default
+    private boolean mobileVerified = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

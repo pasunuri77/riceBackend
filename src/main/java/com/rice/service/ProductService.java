@@ -2,6 +2,7 @@ package com.rice.service;
 
 import com.rice.dto.product.ProductRequest;
 import com.rice.dto.product.ProductResponse;
+import com.rice.dto.product.UpdateProductOfferRequest;
 import com.rice.entity.Brand;
 import com.rice.entity.Category;
 import com.rice.entity.Product;
@@ -12,9 +13,11 @@ import com.rice.repository.CategoryRepository;
 import com.rice.repository.ProductRepository;
 import com.rice.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -33,6 +36,52 @@ public class ProductService {
 
     public ProductResponse getById(String id) {
         return toResponse(find(id));
+    }
+
+    public List<ProductResponse> todaysOffers() {
+        return productRepository.findTodaysOffers(Instant.now()).stream()
+                .map(this::toResponse).toList();
+    }
+
+    @Transactional
+    public ProductResponse updateOffer(String id, UpdateProductOfferRequest request) {
+        Product product = find(id);
+        product.setShowInTodaysOffers(Boolean.TRUE.equals(request.getShowInTodaysOffers()));
+        product.setDisplayPriority(request.getDisplayPriority() == null ? 0 : request.getDisplayPriority());
+        product.setOfferEndDate(request.getOfferEndDate());
+        product.setLowStockThreshold(request.getLowStockThreshold());
+        return toResponse(productRepository.save(product));
+    }
+
+    @Transactional
+    public void reorderOffers(List<String> orderedIds) {
+        if (orderedIds == null || orderedIds.isEmpty()) {
+            throw ApiException.badRequest("Ordered product list cannot be empty");
+        }
+        List<Product> products = productRepository.findAllById(orderedIds);
+        if (products.size() != orderedIds.size()) {
+            throw ApiException.badRequest("Some product ids are invalid");
+        }
+        for (int i = 0; i < orderedIds.size(); i++) {
+            String productId = orderedIds.get(i);
+            Product product = products.stream()
+                    .filter(p -> p.getId().equals(productId))
+                    .findFirst()
+                    .orElseThrow(() -> ApiException.badRequest("Unknown product id: " + productId));
+            product.setDisplayPriority(i);
+        }
+        productRepository.saveAll(products);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 * * * *")
+    public void expireTodaysOffers() {
+        List<Product> expired = productRepository.findExpiredOffers(Instant.now());
+        if (expired.isEmpty()) {
+            return;
+        }
+        expired.forEach(p -> p.setShowInTodaysOffers(false));
+        productRepository.saveAll(expired);
     }
 
     public List<ProductResponse> related(String id, int limit) {
@@ -72,6 +121,10 @@ public class ProductService {
         product.setGrainLength(req.getGrainLength());
         product.setDescription(req.getDescription());
         product.setPricePerKg(req.getPricePerKg());
+        product.setShowInTodaysOffers(Boolean.TRUE.equals(req.getShowInTodaysOffers()));
+        product.setDisplayPriority(req.getDisplayPriority() == null ? 0 : req.getDisplayPriority());
+        product.setOfferEndDate(req.getOfferEndDate());
+        product.setLowStockThreshold(req.getLowStockThreshold());
         product.setMrp(req.getMrp());
         product.setStock(req.getStock());
         product.setMinOrder(req.getMinOrder());
@@ -124,10 +177,13 @@ public class ProductService {
                 .grainLength(p.getGrainLength())
                 .description(p.getDescription())
                 .pricePerKg(p.getPricePerKg())
+                .showInTodaysOffers(p.isShowInTodaysOffers())
+                .displayPriority(p.getDisplayPriority())
+                .offerEndDate(p.getOfferEndDate())
+                .lowStockThreshold(p.getLowStockThreshold())
                 .mrp(p.getMrp())
                 .stock(p.getStock())
                 .minOrder(p.getMinOrder())
-                .maxOrder(p.getMaxOrder())
                 .rating(p.getRating())
                 .reviews((int) reviewCount)
                 .image(p.getImage())

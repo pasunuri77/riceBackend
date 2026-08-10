@@ -2,3 +2,7 @@ target/
 .idea/
 *.class
 *.log
+.env
+.env.*
+application-local.properties
+application-prod.properties

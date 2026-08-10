@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -72,7 +73,24 @@ public class OrderService {
             decrementStock(order);
         }
 
+        if (previous != DeliveryStatus.DELIVERED && next == DeliveryStatus.DELIVERED) {
+            Instant deliveredAt = Instant.now();
+            order.setDeliveredAt(deliveredAt);
+            order.setDelayFlag(order.getEstimatedDeliveryDate() != null && deliveredAt.isAfter(order.getEstimatedDeliveryDate()));
+        }
+
         order.setDeliveryStatus(next);
+        return toResponse(orderRepository.save(order));
+    }
+
+    @Transactional
+    public OrderResponse updateDeliveryInfo(String displayId, com.rice.dto.order.UpdateOrderDeliveryInfoRequest request) {
+        Order order = find(parseDisplayId(displayId));
+        order.setEstimatedDeliveryDate(request.getEstimatedDeliveryDate());
+        order.setDeliveryRemarks(request.getDeliveryRemarks());
+        if (order.getDeliveryStatus() == DeliveryStatus.DELIVERED && order.getDeliveredAt() != null && order.getEstimatedDeliveryDate() != null) {
+            order.setDelayFlag(order.getDeliveredAt().isAfter(order.getEstimatedDeliveryDate()));
+        }
         return toResponse(orderRepository.save(order));
     }
 
@@ -128,6 +146,10 @@ public class OrderService {
                 .notes(req.getNotes())
                 .couponCode(req.getCouponCode() == null ? null : req.getCouponCode().trim().toUpperCase())
                 .discountAmount(discountAmount)
+                .subtotal(subtotal)
+                .tax(tax)
+                .deliveryCharge(deliveryCharge)
+                .offerDiscount(BigDecimal.ZERO)
                 .paymentMethod(method)
                 .paymentStatus(method == PaymentMethod.COD ? PaymentStatus.PENDING : PaymentStatus.PAID)
                 .amount(total)
@@ -311,6 +333,14 @@ public class OrderService {
                 .notes(o.getNotes())
                 .couponCode(o.getCouponCode())
                 .discountAmount(o.getDiscountAmount())
+                .subtotal(o.getSubtotal())
+                .tax(o.getTax())
+                .deliveryCharge(o.getDeliveryCharge())
+                .offerDiscount(o.getOfferDiscount())
+                .estimatedDeliveryDate(o.getEstimatedDeliveryDate())
+                .deliveredAt(o.getDeliveredAt())
+                .delayFlag(o.isDelayFlag())
+                .deliveryRemarks(o.getDeliveryRemarks())
                 .quantity(quantity)
                 .amount(o.getAmount())
                 .paymentStatus(capitalize(o.getPaymentStatus().name()))

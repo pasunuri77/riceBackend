@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -21,6 +22,10 @@ public class ProductResponse {
     private String grainLength;
     private String description;
     private BigDecimal pricePerKg;
+    private Boolean showInTodaysOffers;
+    private Integer displayPriority;
+    private Instant offerEndDate;
+    private Integer lowStockThreshold;
     private BigDecimal mrp;
     private Integer stock;
     private Integer minOrder;
