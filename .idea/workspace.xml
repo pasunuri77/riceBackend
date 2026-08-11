@@ -5,29 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cd1d9a22-6fbc-424b-b632-d34c8fa25317" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/RicebackendApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/RicebackendApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/controller/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/controller/ProductController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/auth/UserResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/auth/UserResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/product/ProductRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/product/ProductRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/product/ProductResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/product/ProductResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/entity/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/entity/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/entity/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/entity/Product.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/repository/ProductRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/repository/ProductRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/ProductService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/schema.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +14,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="123" />
+    <option name="cachedIndexableFilesCount" value="125" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -61,23 +40,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.6888925652893578" />
-      <entry key="MS500" value="3.607114280851903" />
-      <entry key="S2" value="6.534307507903458" />
-      <entry key="S5" value="11.771243228310976" />
-      <entry key="S10" value="16.466167321718316" />
-      <entry key="S30" value="21.557904597152596" />
-      <entry key="S60" value="23.200024776690423" />
-      <entry key="M2" value="24.365531184379744" />
-      <entry key="M5" value="26.92395474933694" />
-      <entry key="M10" value="31.406225894159306" />
-      <entry key="M15" value="42.9954887059935" />
-      <entry key="M30" value="125.97653411949184" />
-      <entry key="H1" value="311.6921868808771" />
-      <entry key="H2" value="521.8847231697084" />
-      <entry key="H4" value="682.8722529717296" />
-      <entry key="D1" value="858.3951912820314" />
-      <entry key="W1" value="893.0756450391398" />
+      <entry key="MS100" value="1.0007349840531103" />
+      <entry key="MS500" value="1.2716995924908598" />
+      <entry key="S2" value="3.478362165563927" />
+      <entry key="S5" value="7.3204693719653875" />
+      <entry key="S10" value="13.150425372645987" />
+      <entry key="S30" value="29.61166783310805" />
+      <entry key="S60" value="43.52662967695827" />
+      <entry key="M2" value="57.96157882507198" />
+      <entry key="M5" value="74.01036851963939" />
+      <entry key="M10" value="84.45263212562446" />
+      <entry key="M15" value="97.27511858671099" />
+      <entry key="M30" value="178.127807069179" />
+      <entry key="H1" value="361.9933061757594" />
+      <entry key="H2" value="574.1624239695087" />
+      <entry key="H4" value="738.5193227216056" />
+      <entry key="D1" value="919.0642532614107" />
+      <entry key="W1" value="954.877814806109" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -99,23 +78,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.6257885920318924" />
-      <entry key="MS500" value="3.5787699185351958" />
-      <entry key="S2" value="6.5184976816044795" />
-      <entry key="S5" value="11.756115338264934" />
-      <entry key="S10" value="16.45424665096612" />
-      <entry key="S30" value="21.552291139948863" />
-      <entry key="S60" value="23.196949510487983" />
-      <entry key="M2" value="24.363905675873106" />
-      <entry key="M5" value="26.923236676924613" />
-      <entry key="M10" value="31.405731386367474" />
-      <entry key="M15" value="42.99480105756143" />
-      <entry key="M30" value="125.97487802107386" />
-      <entry key="H1" value="311.68994286009087" />
-      <entry key="H2" value="521.8828235252408" />
-      <entry key="H4" value="682.8710106533406" />
-      <entry key="D1" value="858.3949317211216" />
-      <entry key="W1" value="893.0756064865262" />
+      <entry key="MS100" value="0.04066696432942778" />
+      <entry key="MS500" value="0.5935656176170332" />
+      <entry key="S2" value="3.0476234634227217" />
+      <entry key="S5" value="7.092468187898216" />
+      <entry key="S10" value="13.01969584119989" />
+      <entry key="S30" value="29.55273229498393" />
+      <entry key="S60" value="43.49085741517784" />
+      <entry key="M2" value="57.941009980178606" />
+      <entry key="M5" value="74.00118922732788" />
+      <entry key="M10" value="84.44774404661878" />
+      <entry key="M15" value="97.2714998665433" />
+      <entry key="M30" value="178.12473998189012" />
+      <entry key="H1" value="361.99037493040606" />
+      <entry key="H2" value="574.1601738198996" />
+      <entry key="H4" value="738.5178989763133" />
+      <entry key="D1" value="919.0639619336421" />
+      <entry key="W1" value="954.8777716662903" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
