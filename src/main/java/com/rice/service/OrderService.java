@@ -36,6 +36,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StoreSettingsService storeSettingsService;
     private final CouponService couponService;
+    private final com.rice.service.ProductAnalyticsService productAnalyticsService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 
     public List<OrderResponse> listAll() {
@@ -58,7 +59,17 @@ public class OrderService {
     public OrderResponse updatePaymentStatus(String displayId, String status) {
         Order order = find(parseDisplayId(displayId));
         order.setPaymentStatus(parsePaymentStatusValue(status));
-        return toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        // log purchase events for analytics (one event per order item)
+        try {
+            for (OrderItem item : saved.getItems()) {
+                if (item.getProduct() != null) {
+                    productAnalyticsService.logEvent(item.getProduct().getId(), com.rice.entity.enums.ProductEventType.PURCHASE);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return toResponse(saved);
     }
 
     @Transactional
@@ -315,12 +326,13 @@ public class OrderService {
         String productId = items.isEmpty() || items.get(0).getProduct() == null ? null : items.get(0).getProduct().getId();
         String image = items.isEmpty() ? null : items.get(0).getImageSnapshot();
         List<OrderResponse.ItemResponse> itemResponses = items.stream()
-                .map(i -> OrderResponse.ItemResponse.builder()
-                        .name(i.getProductNameSnapshot())
-                        .weight(i.getWeightKg())
-                        .qty(i.getQty())
-                        .build())
-                .toList();
+            .map(i -> OrderResponse.ItemResponse.builder()
+                .name(i.getProductNameSnapshot())
+                .pricePerKg(i.getPricePerKgSnapshot())
+                .weight(i.getWeightKg())
+                .qty(i.getQty())
+                .build())
+            .toList();
 
         return OrderResponse.builder()
                 .id("ORD" + (10000 + o.getId()))
