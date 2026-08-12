@@ -36,6 +36,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final EmailOtpService emailOtpService;
     private final TwilioVerifyService twilioVerifyService;
+    private final CloudinaryService cloudinaryService;
 
     public AuthResponse login(LoginRequest request) {
         String email = emailOtpService.normalize(request.getEmail());
@@ -169,6 +170,15 @@ public class AuthService {
         return toResponse(userRepository.save(user));
     }
 
+    @Transactional
+    public UserResponse uploadAvatar(String authenticatedEmail, org.springframework.web.multipart.MultipartFile file) {
+        User user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> ApiException.unauthorized("Please login again"));
+        String url = cloudinaryService.upload(file);
+        user.setImage(url);
+        return toResponse(userRepository.save(user));
+    }
+
     public UserResponse toResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
@@ -177,6 +187,7 @@ public class AuthService {
                 .phone(user.getPhone())
                 .mobileVerified(user.isMobileVerified())
                 .role(user.getRole().name().toLowerCase())
+                .image(user.getImage())
                 .build();
     }
 }

@@ -14,4 +14,5 @@ public class UserResponse {
     private String phone;
     private boolean mobileVerified;
     private String role;
+    private String image;
 }
