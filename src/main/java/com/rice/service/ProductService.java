@@ -148,15 +148,36 @@ public class ProductService {
         product.setStatus("Inactive".equalsIgnoreCase(req.getStatus()) ? ProductStatus.INACTIVE : ProductStatus.ACTIVE);
 
         if (req.getBrand() != null) {
-            Brand brand = brandRepository.findByName(req.getBrand())
-                    .orElseThrow(() -> ApiException.badRequest("Unknown brand: " + req.getBrand()));
+            Brand brand = brandRepository.findByName(req.getBrand()).orElseGet(() -> {
+                String id = slugify(req.getBrand());
+                if (brandRepository.existsById(id)) {
+                    id = id + "-" + System.currentTimeMillis();
+                }
+                Brand b = Brand.builder().id(id).name(req.getBrand()).build();
+                return brandRepository.save(b);
+            });
             product.setBrand(brand);
         }
         if (req.getCategory() != null) {
-            Category category = categoryRepository.findByName(req.getCategory())
-                    .orElseThrow(() -> ApiException.badRequest("Unknown category: " + req.getCategory()));
+            Category category = categoryRepository.findByName(req.getCategory()).orElseGet(() -> {
+                String id = slugify(req.getCategory());
+                if (categoryRepository.existsById(id)) {
+                    id = id + "-" + System.currentTimeMillis();
+                }
+                Category c = Category.builder().id(id).name(req.getCategory()).build();
+                return categoryRepository.save(c);
+            });
             product.setCategory(category);
         }
+    }
+
+    private String slugify(String s) {
+        if (s == null) return null;
+        String slug = s.strip().toLowerCase().replaceAll("[^a-z0-9]+", "-");
+        if (slug.startsWith("-")) slug = slug.substring(1);
+        if (slug.endsWith("-")) slug = slug.substring(0, slug.length() - 1);
+        if (slug.isEmpty()) slug = "item-" + System.currentTimeMillis();
+        return slug;
     }
 
     private Product find(String id) {
