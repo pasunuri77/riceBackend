@@ -184,7 +184,7 @@ public class OrderService {
             if (product.getStock() == null || product.getStock() < totalKg) {
                 throw ApiException.badRequest("Insufficient stock for product: " + product.getId());
             }
-            product.setStock(product.getStock() - totalKg);
+            decrementBagStock(product, weight, qty);
 
             OrderItem item = OrderItem.builder()
                     .order(order)
@@ -245,10 +245,7 @@ public class OrderService {
                 continue;
             }
             int totalKg = weightKg * qty;
-            if (product.getStock() == null || product.getStock() < totalKg) {
-                throw ApiException.badRequest("Insufficient stock to restore order: " + product.getId());
-            }
-            product.setStock(product.getStock() - totalKg);
+            decrementBagStock(product, weightKg, qty);
         }
     }
 
@@ -266,6 +263,49 @@ public class OrderService {
                 continue;
             }
             product.setStock((product.getStock() == null ? 0 : product.getStock()) + (weightKg * qty));
+            restoreBagStock(product, weightKg, qty);
+        }
+    }
+
+    private void decrementBagStock(Product product, int weightKg, int qty) {
+        int currentStock = product.getStock() == null ? 0 : product.getStock();
+        int totalKg = weightKg * qty;
+        if (currentStock < totalKg) {
+            throw ApiException.badRequest("Insufficient stock for product: " + product.getId());
+        }
+        product.setStock(currentStock - totalKg);
+        Integer currentBagStock = getBagStock(product, weightKg);
+        if (currentBagStock != null) {
+            if (currentBagStock < qty) {
+                throw ApiException.badRequest("Insufficient " + weightKg + "kg bag stock for product: " + product.getId());
+            }
+            setBagStock(product, weightKg, currentBagStock - qty);
+        }
+    }
+
+    private void restoreBagStock(Product product, int weightKg, int qty) {
+        Integer currentBagStock = getBagStock(product, weightKg);
+        if (currentBagStock != null) {
+            setBagStock(product, weightKg, currentBagStock + qty);
+        }
+    }
+
+    private Integer getBagStock(Product product, int weightKg) {
+        return switch (weightKg) {
+            case 1 -> product.getStock1Kg();
+            case 5 -> product.getStock5Kg();
+            case 10 -> product.getStock10Kg();
+            case 50 -> product.getStock50Kg();
+            default -> null;
+        };
+    }
+
+    private void setBagStock(Product product, int weightKg, Integer value) {
+        switch (weightKg) {
+            case 1 -> product.setStock1Kg(value);
+            case 5 -> product.setStock5Kg(value);
+            case 10 -> product.setStock10Kg(value);
+            case 50 -> product.setStock50Kg(value);
         }
     }
 

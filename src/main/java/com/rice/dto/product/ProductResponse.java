@@ -28,6 +28,10 @@ public class ProductResponse {
     private Integer lowStockThreshold;
     private BigDecimal mrp;
     private Integer stock;
+    private Integer stock1Kg;
+    private Integer stock5Kg;
+    private Integer stock10Kg;
+    private Integer stock50Kg;
     private Integer minOrder;
     private Integer maxOrder;
     private Double rating;

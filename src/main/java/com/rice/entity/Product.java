@@ -60,6 +60,18 @@ public class Product {
     @Column(nullable = false)
     private Integer stock;
 
+    @Column(name = "stock_1kg")
+    private Integer stock1Kg;
+
+    @Column(name = "stock_5kg")
+    private Integer stock5Kg;
+
+    @Column(name = "stock_10kg")
+    private Integer stock10Kg;
+
+    @Column(name = "stock_50kg")
+    private Integer stock50Kg;
+
     @Column(name = "min_order")
     private Integer minOrder;
 

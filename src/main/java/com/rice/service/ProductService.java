@@ -126,7 +126,11 @@ public class ProductService {
         product.setOfferEndDate(req.getOfferEndDate());
         product.setLowStockThreshold(req.getLowStockThreshold());
         product.setMrp(req.getMrp());
-        product.setStock(req.getStock());
+        product.setStock(computeTotalStock(req));
+        product.setStock1Kg(req.getStock1Kg());
+        product.setStock5Kg(req.getStock5Kg());
+        product.setStock10Kg(req.getStock10Kg());
+        product.setStock50Kg(req.getStock50Kg());
         product.setMinOrder(req.getMinOrder());
         product.setMaxOrder(req.getMaxOrder());
         product.setImage(req.getImage());
@@ -171,6 +175,14 @@ public class ProductService {
         }
     }
 
+    private Integer computeTotalStock(ProductRequest req) {
+        int s1 = req.getStock1Kg() == null ? 0 : req.getStock1Kg();
+        int s5 = req.getStock5Kg() == null ? 0 : req.getStock5Kg();
+        int s10 = req.getStock10Kg() == null ? 0 : req.getStock10Kg();
+        int s50 = req.getStock50Kg() == null ? 0 : req.getStock50Kg();
+        return s1 + s5 * 5 + s10 * 10 + s50 * 50;
+    }
+
     private String slugify(String s) {
         if (s == null) return null;
         String slug = s.strip().toLowerCase().replaceAll("[^a-z0-9]+", "-");
@@ -204,6 +216,10 @@ public class ProductService {
                 .lowStockThreshold(p.getLowStockThreshold())
                 .mrp(p.getMrp())
                 .stock(p.getStock())
+                .stock1Kg(p.getStock1Kg())
+                .stock5Kg(p.getStock5Kg())
+                .stock10Kg(p.getStock10Kg())
+                .stock50Kg(p.getStock50Kg())
                 .minOrder(p.getMinOrder())
                 .rating(p.getRating())
                 .reviews((int) reviewCount)
