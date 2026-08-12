@@ -86,10 +86,11 @@ public class Product {
 
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 2000)
     @Builder.Default
     private List<String> images = new ArrayList<>();
 
+    @Column(length = 2000)
     private String image;
 
     private String supplier;

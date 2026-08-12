@@ -46,6 +46,7 @@ public class StoreSettingsService {
         settings.setStoreName(request.getStoreName());
         settings.setGstNumber(request.getGstNumber());
         settings.setPhone(request.getPhone());
+        settings.setLogo(request.getLogo());
         settings.setEmail(request.getEmail());
         settings.setCurrency(blankToDefault(request.getCurrency(), "INR"));
         settings.setDeliveryCharge(defaultMoney(request.getDeliveryCharge()));
@@ -66,6 +67,7 @@ public class StoreSettingsService {
                 .storeName("RiceBazaar")
                 .gstNumber("")
                 .phone("")
+                .logo("")
                 .email("")
                 .currency("INR")
                 .deliveryCharge(defaultMoney(defaultDeliveryCharge))
@@ -80,6 +82,7 @@ public class StoreSettingsService {
                 .storeName(settings.getStoreName())
                 .gstNumber(settings.getGstNumber())
                 .phone(settings.getPhone())
+                .logo(settings.getLogo())
                 .email(settings.getEmail())
                 .currency(settings.getCurrency())
                 .deliveryCharge(settings.getDeliveryCharge())

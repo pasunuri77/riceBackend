@@ -5,6 +5,7 @@ import com.rice.repository.ProductDeliveryCoverageRepository;
 import com.rice.repository.ProductRepository;
 import com.rice.repository.ServiceablePincodeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class DeliveryService {
     private final ProductRepository productRepository;
     private final ProductDeliveryCoverageRepository productDeliveryCoverageRepository;
 
+    @Autowired
     public DeliveryService(ServiceablePincodeRepository repo,
                           ProductRepository productRepository,
                           ProductDeliveryCoverageRepository productDeliveryCoverageRepository) {

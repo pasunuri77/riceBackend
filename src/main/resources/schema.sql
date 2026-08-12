@@ -27,6 +27,17 @@ ALTER TABLE products
 ALTER TABLE users
     ADD COLUMN IF NOT EXISTS mobile_verified boolean NOT NULL DEFAULT false;
 
+-- Add store logo column for persisting uploaded logo URL
+ALTER TABLE store_settings
+    ADD COLUMN IF NOT EXISTS logo varchar(255);
+
+-- Increase product image URL length to accommodate long external links
+ALTER TABLE products
+    ALTER COLUMN image TYPE varchar(2000);
+
+ALTER TABLE product_images
+    ALTER COLUMN image_url TYPE varchar(2000);
+
 UPDATE orders
     SET discount_amount = 0
     WHERE discount_amount IS NULL;

@@ -21,6 +21,8 @@ public class StoreSettingsRequest {
     @Email
     private String email;
 
+    private String logo;
+
     private String currency;
 
     @DecimalMin("0.0")

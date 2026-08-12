@@ -13,6 +13,7 @@ public class StoreSettingsResponse {
     private String gstNumber;
     private String phone;
     private String email;
+    private String logo;
     private String currency;
     private BigDecimal deliveryCharge;
     private BigDecimal freeDeliveryThreshold;

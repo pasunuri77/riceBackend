@@ -34,6 +34,8 @@ public class StoreSettings {
 
     private String email;
 
+    private String logo;
+
     @Column(nullable = false)
     @Builder.Default
     private String currency = "INR";
