@@ -55,4 +55,19 @@ public class AdminDeliveryController {
         resp.getWriter().write(pincodes.stream().collect(Collectors.joining("\n")));
         resp.getWriter().flush();
     }
+
+    @GetMapping("/api/admin/delivery/products/{productId}/pincodes")
+    public List<String> listProductPincodes(@PathVariable String productId) {
+        return deliveryService.listProductPincodes(productId);
+    }
+
+    @PostMapping("/api/admin/delivery/products/{productId}/pincodes")
+    public List<String> addProductPincodes(@PathVariable String productId, @RequestBody AdminPincodesRequest req) {
+        return deliveryService.addProductPincodes(productId, req.getPincodes());
+    }
+
+    @DeleteMapping("/api/admin/delivery/products/{productId}/pincodes/{pincode}")
+    public void deleteProductPincode(@PathVariable String productId, @PathVariable String pincode) {
+        deliveryService.removeProductPincode(productId, pincode);
+    }
 }

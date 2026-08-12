@@ -1,6 +1,7 @@
 package com.rice.service;
 
 import com.rice.entity.ServiceablePincode;
+import com.rice.repository.ProductRepository;
 import com.rice.repository.ServiceablePincodeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +16,14 @@ import static org.mockito.Mockito.*;
 class DeliveryServiceTest {
 
     private ServiceablePincodeRepository repo;
+    private ProductRepository productRepository;
     private DeliveryService service;
 
     @BeforeEach
     void setUp() {
         repo = mock(ServiceablePincodeRepository.class);
-        service = new DeliveryService(repo);
+        productRepository = mock(ProductRepository.class);
+        service = new DeliveryService(repo, productRepository);
     }
 
     @Test
@@ -56,5 +59,14 @@ class DeliveryServiceTest {
         when(repo.findByPincode("500003")).thenReturn(Optional.of(p));
         service.removePincode("500003");
         verify(repo).delete(p);
+    }
+
+    @Test
+    void isProductServiceable_returnsTrueOnlyWhenProductExistsAndPincodeIsServiceable() {
+        when(productRepository.existsById("p123")).thenReturn(true);
+        when(repo.findByPincode("500001")).thenReturn(Optional.of(new ServiceablePincode(1L, "500001")));
+
+        assertTrue(service.isProductServiceable("p123", "500001"));
+        assertFalse(service.isProductServiceable("missing", "500001"));
     }
 }
