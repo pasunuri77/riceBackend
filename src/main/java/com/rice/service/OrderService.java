@@ -3,6 +3,7 @@ package com.rice.service;
 import com.rice.dto.order.OrderCreateRequest;
 import com.rice.dto.order.OrderItemRequest;
 import com.rice.dto.order.OrderResponse;
+import com.rice.email.EmailService;
 import com.rice.entity.Order;
 import com.rice.entity.OrderItem;
 import com.rice.entity.Product;
@@ -36,6 +37,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StoreSettingsService storeSettingsService;
     private final CouponService couponService;
+    private final EmailService emailService;
     private final com.rice.service.ProductAnalyticsService productAnalyticsService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 
@@ -91,7 +93,22 @@ public class OrderService {
         }
 
         order.setDeliveryStatus(next);
-        return toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+
+        if (saved.getCustomer() != null && saved.getCustomer().getEmail() != null) {
+            String orderId = "ORD" + (10000 + saved.getId());
+            if (previous != DeliveryStatus.PROCESSING && next == DeliveryStatus.PROCESSING) {
+                emailService.sendOrderAcceptedEmail(saved.getCustomer().getEmail(), saved.getCustomer().getName(), orderId);
+            } else if (previous != DeliveryStatus.SHIPPED && next == DeliveryStatus.SHIPPED) {
+                emailService.sendOrderShippedEmail(saved.getCustomer().getEmail(), saved.getCustomer().getName(), orderId);
+            } else if (previous != DeliveryStatus.DELIVERED && next == DeliveryStatus.DELIVERED) {
+                emailService.sendOrderDeliveredEmail(saved.getCustomer().getEmail(), saved.getCustomer().getName(), orderId);
+            } else if (previous != DeliveryStatus.CANCELLED && next == DeliveryStatus.CANCELLED) {
+                emailService.sendOrderCancelledEmail(saved.getCustomer().getEmail(), saved.getCustomer().getName(), orderId);
+            }
+        }
+
+        return toResponse(saved);
     }
 
     @Transactional

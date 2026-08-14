@@ -10,6 +10,26 @@ public interface EmailService {
             String email,
             String otp);
 
+    void sendOrderAcceptedEmail(
+            String email,
+            String customerName,
+            String orderId);
+
+    void sendOrderShippedEmail(
+            String email,
+            String customerName,
+            String orderId);
+
+    void sendOrderDeliveredEmail(
+            String email,
+            String customerName,
+            String orderId);
+
+    void sendOrderCancelledEmail(
+            String email,
+            String customerName,
+            String orderId);
+
     void sendContactMessage(
             String name,
             String email,
