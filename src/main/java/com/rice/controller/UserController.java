@@ -3,6 +3,7 @@ package com.rice.controller;
 import com.rice.dto.auth.ProfileUpdateRequest;
 import com.rice.dto.auth.UserResponse;
 import com.rice.service.AuthService;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,5 +32,16 @@ public class UserController {
     public UserResponse uploadAvatar(Authentication authentication,
                                      @RequestParam("file") MultipartFile file) {
         return authService.uploadAvatar(authentication.getName(), file);
+    }
+
+    @PostMapping("/me/photo")
+    public UserResponse uploadPhoto(Authentication authentication,
+                                   @RequestParam("file") MultipartFile file) {
+        return authService.uploadPhoto(authentication.getName(), file);
+    }
+
+    @DeleteMapping("/me/photo")
+    public UserResponse deletePhoto(Authentication authentication) {
+        return authService.deletePhoto(authentication.getName());
     }
 }

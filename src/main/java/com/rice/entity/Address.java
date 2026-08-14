@@ -39,8 +39,7 @@ public class Address {
     private String district;
     private String state;
 
-    @Builder.Default
-    private String country = "India";
+    private String country;
 
     private String pincode;
 

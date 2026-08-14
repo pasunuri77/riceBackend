@@ -11,10 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class DeliveryService {
     private static final Logger log = LoggerFactory.getLogger(DeliveryService.class);
+    private static final Pattern ZIP_PATTERN = Pattern.compile("\\d{5}(?:-\\d{4})?");
+
     private final ServiceablePincodeRepository repo;
     private final ProductRepository productRepository;
     private final ProductDeliveryCoverageRepository productDeliveryCoverageRepository;
@@ -39,7 +42,7 @@ public class DeliveryService {
     public boolean isServiceable(String pincode) {
         if (pincode == null) return false;
         String normalized = pincode.trim();
-        boolean matches = normalized.matches("\\d{6}");
+        boolean matches = ZIP_PATTERN.matcher(normalized).matches();
         if (!matches) {
             log.debug("isServiceable: pincode '{}' rejected by format check", normalized);
             return false;
@@ -75,7 +78,7 @@ public class DeliveryService {
         for (String p : pincodes) {
             if (p == null) continue;
             String n = p.trim();
-            if (!n.matches("\\d{6}")) continue;
+            if (!ZIP_PATTERN.matcher(n).matches()) continue;
             boolean exists = repo.findByPincode(n).isPresent();
             if (!exists) {
                 toSave.add(com.rice.entity.ServiceablePincode.builder().pincode(n).build());
@@ -101,7 +104,7 @@ public class DeliveryService {
         for (String p : pincodes) {
             if (p == null) continue;
             String n = p.trim();
-            if (!n.matches("\\d{6}")) continue;
+            if (!ZIP_PATTERN.matcher(n).matches()) continue;
             if (!repo.findByPincode(n).isPresent()) {
                 repo.save(new com.rice.entity.ServiceablePincode(null, n));
             }

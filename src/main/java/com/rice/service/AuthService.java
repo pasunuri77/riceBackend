@@ -172,6 +172,11 @@ public class AuthService {
 
     @Transactional
     public UserResponse uploadAvatar(String authenticatedEmail, org.springframework.web.multipart.MultipartFile file) {
+        return uploadPhoto(authenticatedEmail, file);
+    }
+
+    @Transactional
+    public UserResponse uploadPhoto(String authenticatedEmail, org.springframework.web.multipart.MultipartFile file) {
         User user = userRepository.findByEmail(authenticatedEmail)
                 .orElseThrow(() -> ApiException.unauthorized("Please login again"));
         String url = cloudinaryService.upload(file);
@@ -179,7 +184,16 @@ public class AuthService {
         return toResponse(userRepository.save(user));
     }
 
+    @Transactional
+    public UserResponse deletePhoto(String authenticatedEmail) {
+        User user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> ApiException.unauthorized("Please login again"));
+        user.setImage(null);
+        return toResponse(userRepository.save(user));
+    }
+
     public UserResponse toResponse(User user) {
+        String photoUrl = user.getImage();
         return UserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -187,7 +201,8 @@ public class AuthService {
                 .phone(user.getPhone())
                 .mobileVerified(user.isMobileVerified())
                 .role(user.getRole().name().toLowerCase())
-                .image(user.getImage())
+                .image(photoUrl)
+                .photoUrl(photoUrl)
                 .build();
     }
 }

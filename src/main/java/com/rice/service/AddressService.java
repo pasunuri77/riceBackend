@@ -43,7 +43,7 @@ public class AddressService {
                 .city(req.getCity())
                 .district(req.getDistrict())
                 .state(req.getState())
-                .country(req.getCountry() == null ? "India" : req.getCountry())
+                .country(req.getCountry())
                 .pincode(req.getPincode())
                 .type(parseType(req.getType()))
                 .instructions(req.getInstructions())

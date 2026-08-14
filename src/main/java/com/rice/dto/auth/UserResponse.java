@@ -15,4 +15,5 @@ public class UserResponse {
     private boolean mobileVerified;
     private String role;
     private String image;
+    private String photoUrl;
 }
