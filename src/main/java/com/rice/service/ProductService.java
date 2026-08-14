@@ -10,6 +10,7 @@ import com.rice.entity.enums.ProductStatus;
 import com.rice.exception.ApiException;
 import com.rice.repository.BrandRepository;
 import com.rice.repository.CategoryRepository;
+import com.rice.repository.OrderItemRepository;
 import com.rice.repository.ProductRepository;
 import com.rice.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class ProductService {
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
     private final ReviewRepository reviewRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public List<ProductResponse> list() {
         return productRepository.findAll().stream().map(this::toResponse).toList();
@@ -110,6 +112,12 @@ public class ProductService {
     public void delete(String id) {
         if (!productRepository.existsById(id)) {
             throw ApiException.notFound("Product not found");
+        }
+        if (orderItemRepository.existsByProductId(id)) {
+            throw ApiException.badRequest("This product has existing orders and can't be deleted. Set it to Inactive instead.");
+        }
+        if (reviewRepository.existsByProductId(id)) {
+            throw ApiException.badRequest("This product has existing reviews and can't be deleted. Set it to Inactive instead.");
         }
         productRepository.deleteById(id);
     }

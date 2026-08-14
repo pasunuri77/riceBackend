@@ -7,12 +7,14 @@ import com.rice.repository.ServiceablePincodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Service
 public class DeliveryService {
-
+    private static final Logger log = LoggerFactory.getLogger(DeliveryService.class);
     private final ServiceablePincodeRepository repo;
     private final ProductRepository productRepository;
     private final ProductDeliveryCoverageRepository productDeliveryCoverageRepository;
@@ -37,8 +39,14 @@ public class DeliveryService {
     public boolean isServiceable(String pincode) {
         if (pincode == null) return false;
         String normalized = pincode.trim();
-        if (!normalized.matches("\\d{6}")) return false;
-        return repo.findByPincode(normalized).isPresent();
+        boolean matches = normalized.matches("\\d{6}");
+        if (!matches) {
+            log.debug("isServiceable: pincode '{}' rejected by format check", normalized);
+            return false;
+        }
+        boolean present = repo.findByPincode(normalized).isPresent();
+        log.debug("isServiceable: pincode '{}' format ok={}, presentInRepo={}", normalized, matches, present);
+        return present;
     }
 
     public boolean isProductServiceable(String productId, String pincode) {
@@ -50,9 +58,11 @@ public class DeliveryService {
         if (!isServiceable(pincode)) {
             return false;
         }
-        return productDeliveryCoverageRepository == null
+        boolean result = productDeliveryCoverageRepository == null
                 || productDeliveryCoverageRepository.findByProductIdAndPincodeAndActiveTrue(normalizedProductId, pincode.trim()).isPresent()
                 || productDeliveryCoverageRepository.findByProductIdAndActiveTrue(normalizedProductId).isEmpty();
+        log.debug("isProductServiceable: productId='{}' pincode='{}' -> {}", normalizedProductId, pincode, result);
+        return result;
     }
 
     public java.util.List<String> listPincodes() {

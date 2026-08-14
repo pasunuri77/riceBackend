@@ -1,3 +1,16 @@
+-- Repair historical orphan rows before enforcing relational constraints.
+DELETE FROM order_items oi
+WHERE oi.order_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.id = oi.order_id);
+
+DELETE FROM order_items oi
+WHERE oi.product_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM products p WHERE p.id = oi.product_id);
+
+DELETE FROM reviews r
+WHERE r.product_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM products p WHERE p.id = r.product_id);
+
 -- Schema migration for existing orders to support coupon discount amount
 
 ALTER TABLE orders
