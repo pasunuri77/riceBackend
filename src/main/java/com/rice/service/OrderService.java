@@ -41,7 +41,6 @@ public class OrderService {
     private final CouponService couponService;
     private final EmailService emailService;
     private final com.rice.service.ProductAnalyticsService productAnalyticsService;
-    private final EmailService emailService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
@@ -99,7 +98,11 @@ public class OrderService {
         }
 
         order.setDeliveryStatus(next);
-        return toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        if (previous != next) {
+            sendStatusEmail(saved, next);
+        }
+        return toResponse(saved);
     }
 
     @Transactional
@@ -386,7 +389,16 @@ public class OrderService {
         }
         try {
             User customer = order.getCustomer();
-            emailService.sendOrderStatusUpdate(customer.getEmail(), customer.getName(), displayId(order), status);
+            String email = customer.getEmail();
+            String name = customer.getName();
+            String orderId = displayId(order);
+            switch (status) {
+                case PROCESSING -> emailService.sendOrderAcceptedEmail(email, name, orderId);
+                case SHIPPED -> emailService.sendOrderShippedEmail(email, name, orderId);
+                case DELIVERED -> emailService.sendOrderDeliveredEmail(email, name, orderId);
+                case CANCELLED -> emailService.sendOrderCancelledEmail(email, name, orderId);
+                case PENDING -> { /* not a notifiable transition, guarded above */ }
+            }
         } catch (Exception e) {
             log.warn("Failed to send order status email for {} ({}): {}", displayId(order), status, e.getMessage());
         }

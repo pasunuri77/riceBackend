@@ -1,6 +1,5 @@
 package com.rice.email;
 
-import com.rice.entity.enums.DeliveryStatus;
 import com.rice.exception.ApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -196,61 +195,6 @@ public class EmailServiceImpl implements EmailService {
                 </div>
                 """.formatted(safeName, safeEmail, safeSubject, safeMessage);
         sendEmail(supportEmail, "RiceBazaar Contact: " + subject, html, name, email);
-    }
-
-    @Override
-    public void sendOrderStatusUpdate(String email, String customerName, String orderId, DeliveryStatus status) {
-        String safeName = escapeHtml(customerName);
-        String safeOrderId = escapeHtml(orderId);
-        OrderStatusCopy copy = copyFor(status, safeName, safeOrderId);
-        String html = """
-                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
-                    <div style="max-width:560px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
-                        <div style="background:%s;color:white;padding:28px;text-align:center;">
-                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
-                            <p style="margin:8px 0 0;">%s</p>
-                        </div>
-                        <div style="padding:32px;">
-                            <h2 style="margin-top:0;color:#111827;">%s</h2>
-                            <p style="color:#4b5563;line-height:24px;">%s</p>
-                            <div style="margin:24px 0;padding:16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;">
-                                <p style="margin:0;color:#6b7280;font-size:13px;">Order</p>
-                                <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">%s</p>
-                            </div>
-                            <p style="color:#6b7280;font-size:13px;">You can track this order anytime from the "My Orders" section of your RiceBazaar account.</p>
-                        </div>
-                    </div>
-                </div>
-                """.formatted(copy.color, copy.eyebrow, copy.heading, copy.body, safeOrderId);
-        sendEmail(email, copy.subject, html);
-    }
-
-    private record OrderStatusCopy(String color, String eyebrow, String heading, String body, String subject) {}
-
-    private OrderStatusCopy copyFor(DeliveryStatus status, String customerName, String orderId) {
-        return switch (status) {
-            case PROCESSING -> new OrderStatusCopy(
-                    "#1d4ed8", "Order update",
-                    "Your order is being processed",
-                    "Hi " + customerName + ", we've started processing your order " + orderId + ". We'll email you again as soon as it ships.",
-                    "Your RiceBazaar order " + orderId + " is being processed");
-            case SHIPPED -> new OrderStatusCopy(
-                    "#b45309", "Order update",
-                    "Your order has shipped",
-                    "Hi " + customerName + ", your order " + orderId + " is on its way to you.",
-                    "Your RiceBazaar order " + orderId + " has shipped");
-            case DELIVERED -> new OrderStatusCopy(
-                    "#166534", "Order update",
-                    "Your order has been delivered",
-                    "Hi " + customerName + ", your order " + orderId + " has been delivered. We hope you enjoy your rice!",
-                    "Your RiceBazaar order " + orderId + " has been delivered");
-            case CANCELLED -> new OrderStatusCopy(
-                    "#991b1b", "Order update",
-                    "Your order has been cancelled",
-                    "Hi " + customerName + ", your order " + orderId + " has been cancelled. If you didn't request this or have questions, please contact us.",
-                    "Your RiceBazaar order " + orderId + " has been cancelled");
-            case PENDING -> throw new IllegalArgumentException("PENDING is not a notifiable order status transition");
-        };
     }
 
     private void sendEmail(String email, String subject, String html) {
