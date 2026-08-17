@@ -3,6 +3,7 @@ package com.rice.service;
 import com.rice.dto.order.OrderCreateRequest;
 import com.rice.dto.order.OrderItemRequest;
 import com.rice.dto.order.OrderResponse;
+import com.rice.email.EmailService;
 import com.rice.entity.Order;
 import com.rice.entity.OrderItem;
 import com.rice.entity.Product;
@@ -16,6 +17,8 @@ import com.rice.exception.ApiException;
 import com.rice.repository.OrderRepository;
 import com.rice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +40,9 @@ public class OrderService {
     private final StoreSettingsService storeSettingsService;
     private final CouponService couponService;
     private final com.rice.service.ProductAnalyticsService productAnalyticsService;
+    private final EmailService emailService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     public List<OrderResponse> listAll() {
         return orderRepository.findAllByOrderByCreatedAtDesc().stream().map(this::toResponse).toList();
@@ -91,7 +96,11 @@ public class OrderService {
         }
 
         order.setDeliveryStatus(next);
-        return toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        if (previous != next) {
+            sendStatusEmail(saved, next);
+        }
+        return toResponse(saved);
     }
 
     @Transactional
@@ -118,7 +127,9 @@ public class OrderService {
 
         restoreStock(order);
         order.setDeliveryStatus(DeliveryStatus.CANCELLED);
-        return toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        sendStatusEmail(saved, DeliveryStatus.CANCELLED);
+        return toResponse(saved);
     }
 
     @Transactional
@@ -355,6 +366,26 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> ApiException.notFound("Order not found: " + id));
     }
 
+    private String displayId(Order order) {
+        return "ORD" + (10000 + order.getId());
+    }
+
+    // Best-effort: an email provider outage must never fail (or roll back) the
+    // underlying status change, which is the actual source of truth for the
+    // order. Failures are logged, not thrown, and this runs after save() so the
+    // status change is already committed by the time a mail failure could occur.
+    private void sendStatusEmail(Order order, DeliveryStatus status) {
+        if (status == DeliveryStatus.PENDING) {
+            return;
+        }
+        try {
+            User customer = order.getCustomer();
+            emailService.sendOrderStatusUpdate(customer.getEmail(), customer.getName(), displayId(order), status);
+        } catch (Exception e) {
+            log.warn("Failed to send order status email for {} ({}): {}", displayId(order), status, e.getMessage());
+        }
+    }
+
     private OrderResponse toResponse(Order o) {
         List<OrderItem> items = o.getItems();
         String riceName = items.isEmpty() ? "" :
@@ -375,7 +406,7 @@ public class OrderService {
             .toList();
 
         return OrderResponse.builder()
-                .id("ORD" + (10000 + o.getId()))
+                .id(displayId(o))
                 .customerId(o.getCustomer().getId().toString())
                 .customerName(o.getCustomer().getName())
                 .productId(productId)
