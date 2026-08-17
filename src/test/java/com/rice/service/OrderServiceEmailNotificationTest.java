@@ -1,17 +1,21 @@
 package com.rice.service;
 
 import com.rice.email.EmailService;
+import com.rice.dto.order.OrderCreateRequest;
+import com.rice.dto.order.OrderItemRequest;
 import com.rice.entity.Order;
+import com.rice.entity.Product;
 import com.rice.entity.User;
 import com.rice.entity.enums.DeliveryStatus;
 import com.rice.entity.enums.Role;
-import com.rice.entity.enums.DeliveryStatus;
 import com.rice.repository.OrderRepository;
 import com.rice.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -90,5 +94,39 @@ class OrderServiceEmailNotificationTest {
         service.updateDeliveryStatus("ORD10045", "CANCELLED");
 
         verify(emailService).sendOrderCancelledEmail("dana@example.com", "Dana", "ORD10045");
+    }
+
+    @Test
+    void create_sendsOrderPlacedEmail() {
+        User customer = User.builder().id(21L).name("Eve").email("eve@example.com").role(Role.USER).build();
+        var item = new OrderItemRequest();
+        item.setId("prod-1");
+        item.setName("Basmati Rice");
+        item.setImage("image.png");
+        item.setPricePerKg(new BigDecimal("120.00"));
+        item.setWeight(5);
+        item.setQty(2);
+
+        OrderCreateRequest req = new OrderCreateRequest();
+        req.setAddress("123 Main St");
+        req.setPaymentMethod("COD");
+        req.setItems(List.of(item));
+
+        Product product = Product.builder().id("prod-1").stock(20).build();
+        when(productRepository.findByIdForUpdate("prod-1")).thenReturn(Optional.of(product));
+        when(storeSettingsService.current()).thenReturn(new com.rice.entity.StoreSettings());
+
+        Order order = Order.builder()
+                .id(101L)
+                .customer(customer)
+                .addressSnapshot("123 Main St")
+                .amount(new BigDecimal("1240.00"))
+                .items(List.of())
+                .build();
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
+
+        service.create(customer, req);
+
+        verify(emailService).sendOrderPlaced("eve@example.com", "Eve", "ORD10101", new BigDecimal("1240.00"));
     }
 }

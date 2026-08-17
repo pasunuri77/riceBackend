@@ -4,6 +4,8 @@ import com.rice.entity.enums.DeliveryStatus;
 
 public interface EmailService {
 
+    void sendWelcomeEmail(String email, String name);
+
     void sendPin(
             String email,
             String pin);
@@ -11,6 +13,8 @@ public interface EmailService {
     void sendPasswordResetOtp(
             String email,
             String otp);
+
+    void sendOrderPlaced(String email, String customerName, String orderId, java.math.BigDecimal amount);
 
     void sendOrderAcceptedEmail(
             String email,
