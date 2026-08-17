@@ -79,6 +79,98 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendOrderAcceptedEmail(String email, String customerName, String orderId) {
+        String safeName = escapeHtml(customerName == null ? "Customer" : customerName);
+        String safeOrderId = escapeHtml(orderId == null ? "" : orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#166534;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">Rice Store</h1>
+                            <p style="margin:8px 0 0;color:#dcfce7;">Order accepted</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;line-height:24px;">
+                            <h2 style="margin-top:0;">Hello %s,</h2>
+                            <p>Your order <strong>%s</strong> has been accepted by our admin team and is now being processed.</p>
+                            <p>We will notify you again when your order is shipped and delivered.</p>
+                            <p style="margin-top:24px;color:#4b5563;">Thank you for shopping with Rice Store.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName, safeOrderId);
+        sendEmail(email, "Your order has been accepted", html);
+    }
+
+    @Override
+    public void sendOrderShippedEmail(String email, String customerName, String orderId) {
+        String safeName = escapeHtml(customerName == null ? "Customer" : customerName);
+        String safeOrderId = escapeHtml(orderId == null ? "" : orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#1d4ed8;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">Rice Store</h1>
+                            <p style="margin:8px 0 0;color:#dbeafe;">Your order is on the way</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;line-height:24px;">
+                            <h2 style="margin-top:0;">Hello %s,</h2>
+                            <p>Your order <strong>%s</strong> has been shipped and is on its way to you.</p>
+                            <p>You will receive another update when it is delivered.</p>
+                            <p style="margin-top:24px;color:#4b5563;">Thank you for shopping with Rice Store.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName, safeOrderId);
+        sendEmail(email, "Your order has been shipped", html);
+    }
+
+    @Override
+    public void sendOrderDeliveredEmail(String email, String customerName, String orderId) {
+        String safeName = escapeHtml(customerName == null ? "Customer" : customerName);
+        String safeOrderId = escapeHtml(orderId == null ? "" : orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#0f766e;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">Rice Store</h1>
+                            <p style="margin:8px 0 0;color:#ccfbf1;">Order delivered</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;line-height:24px;">
+                            <h2 style="margin-top:0;">Hello %s,</h2>
+                            <p>Your order <strong>%s</strong> has been delivered successfully.</p>
+                            <p>We hope you enjoy your purchase. Please contact us if you need any assistance.</p>
+                            <p style="margin-top:24px;color:#4b5563;">Thank you for shopping with Rice Store.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName, safeOrderId);
+        sendEmail(email, "Your order has been delivered", html);
+    }
+
+    @Override
+    public void sendOrderCancelledEmail(String email, String customerName, String orderId) {
+        String safeName = escapeHtml(customerName == null ? "Customer" : customerName);
+        String safeOrderId = escapeHtml(orderId == null ? "" : orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#991b1b;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">Rice Store</h1>
+                            <p style="margin:8px 0 0;color:#fee2e2;">Order cancelled</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;line-height:24px;">
+                            <h2 style="margin-top:0;">Hello %s,</h2>
+                            <p>Your order <strong>%s</strong> has been cancelled.</p>
+                            <p>If this was not intentional, please contact support for assistance.</p>
+                            <p style="margin-top:24px;color:#4b5563;">Thank you for shopping with Rice Store.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName, safeOrderId);
+        sendEmail(email, "Your order has been cancelled", html);
+    }
+
+    @Override
     public void sendContactMessage(String name, String email, String subject, String message) {
         String safeName = escapeHtml(name);
         String safeEmail = escapeHtml(email);

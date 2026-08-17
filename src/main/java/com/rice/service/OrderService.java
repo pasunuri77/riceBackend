@@ -39,6 +39,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StoreSettingsService storeSettingsService;
     private final CouponService couponService;
+    private final EmailService emailService;
     private final com.rice.service.ProductAnalyticsService productAnalyticsService;
     private final EmailService emailService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
@@ -69,7 +70,8 @@ public class OrderService {
         try {
             for (OrderItem item : saved.getItems()) {
                 if (item.getProduct() != null) {
-                    productAnalyticsService.logEvent(item.getProduct().getId(), com.rice.entity.enums.ProductEventType.PURCHASE);
+                    productAnalyticsService.logEvent(item.getProduct().getId(),
+                            com.rice.entity.enums.ProductEventType.PURCHASE);
                 }
             }
         } catch (Exception ignored) {
@@ -92,23 +94,22 @@ public class OrderService {
         if (previous != DeliveryStatus.DELIVERED && next == DeliveryStatus.DELIVERED) {
             Instant deliveredAt = Instant.now();
             order.setDeliveredAt(deliveredAt);
-            order.setDelayFlag(order.getEstimatedDeliveryDate() != null && deliveredAt.isAfter(order.getEstimatedDeliveryDate()));
+            order.setDelayFlag(
+                    order.getEstimatedDeliveryDate() != null && deliveredAt.isAfter(order.getEstimatedDeliveryDate()));
         }
 
         order.setDeliveryStatus(next);
-        Order saved = orderRepository.save(order);
-        if (previous != next) {
-            sendStatusEmail(saved, next);
-        }
-        return toResponse(saved);
+        return toResponse(orderRepository.save(order));
     }
 
     @Transactional
-    public OrderResponse updateDeliveryInfo(String displayId, com.rice.dto.order.UpdateOrderDeliveryInfoRequest request) {
+    public OrderResponse updateDeliveryInfo(String displayId,
+            com.rice.dto.order.UpdateOrderDeliveryInfoRequest request) {
         Order order = find(parseDisplayId(displayId));
         order.setEstimatedDeliveryDate(request.getEstimatedDeliveryDate());
         order.setDeliveryRemarks(request.getDeliveryRemarks());
-        if (order.getDeliveryStatus() == DeliveryStatus.DELIVERED && order.getDeliveredAt() != null && order.getEstimatedDeliveryDate() != null) {
+        if (order.getDeliveryStatus() == DeliveryStatus.DELIVERED && order.getDeliveredAt() != null
+                && order.getEstimatedDeliveryDate() != null) {
             order.setDelayFlag(order.getDeliveredAt().isAfter(order.getEstimatedDeliveryDate()));
         }
         return toResponse(orderRepository.save(order));
@@ -288,7 +289,8 @@ public class OrderService {
         Integer currentBagStock = getBagStock(product, weightKg);
         if (currentBagStock != null) {
             if (currentBagStock < qty) {
-                throw ApiException.badRequest("Insufficient " + weightKg + "kg bag stock for product: " + product.getId());
+                throw ApiException
+                        .badRequest("Insufficient " + weightKg + "kg bag stock for product: " + product.getId());
             }
             setBagStock(product, weightKg, currentBagStock - qty);
         }
@@ -321,23 +323,27 @@ public class OrderService {
     }
 
     private PaymentMethod parsePaymentMethod(String value) {
-        if (value == null) return PaymentMethod.COD;
+        if (value == null)
+            return PaymentMethod.COD;
         for (PaymentMethod m : PaymentMethod.values()) {
-            if (m.name().equalsIgnoreCase(value)) return m;
+            if (m.name().equalsIgnoreCase(value))
+                return m;
         }
         return PaymentMethod.COD;
     }
 
     private PaymentStatus parsePaymentStatusValue(String value) {
         for (PaymentStatus status : PaymentStatus.values()) {
-            if (status.name().equals(normalizeStatus(value))) return status;
+            if (status.name().equals(normalizeStatus(value)))
+                return status;
         }
         throw ApiException.badRequest("Invalid payment status: " + value);
     }
 
     private DeliveryStatus parseDeliveryStatusValue(String value) {
         for (DeliveryStatus status : DeliveryStatus.values()) {
-            if (status.name().equals(normalizeStatus(value))) return status;
+            if (status.name().equals(normalizeStatus(value)))
+                return status;
         }
         throw ApiException.badRequest("Invalid delivery status: " + value);
     }
@@ -388,22 +394,23 @@ public class OrderService {
 
     private OrderResponse toResponse(Order o) {
         List<OrderItem> items = o.getItems();
-        String riceName = items.isEmpty() ? "" :
-                items.size() == 1 ? items.get(0).getProductNameSnapshot()
+        String riceName = items.isEmpty() ? ""
+                : items.size() == 1 ? items.get(0).getProductNameSnapshot()
                         : items.get(0).getProductNameSnapshot() + " +" + (items.size() - 1) + " more";
         String quantity = items.stream()
                 .map(i -> i.getWeightKg() + "kg x" + i.getQty())
                 .collect(Collectors.joining(", "));
-        String productId = items.isEmpty() || items.get(0).getProduct() == null ? null : items.get(0).getProduct().getId();
+        String productId = items.isEmpty() || items.get(0).getProduct() == null ? null
+                : items.get(0).getProduct().getId();
         String image = items.isEmpty() ? null : items.get(0).getImageSnapshot();
         List<OrderResponse.ItemResponse> itemResponses = items.stream()
-            .map(i -> OrderResponse.ItemResponse.builder()
-                .name(i.getProductNameSnapshot())
-                .pricePerKg(i.getPricePerKgSnapshot())
-                .weight(i.getWeightKg())
-                .qty(i.getQty())
-                .build())
-            .toList();
+                .map(i -> OrderResponse.ItemResponse.builder()
+                        .name(i.getProductNameSnapshot())
+                        .pricePerKg(i.getPricePerKgSnapshot())
+                        .weight(i.getWeightKg())
+                        .qty(i.getQty())
+                        .build())
+                .toList();
 
         return OrderResponse.builder()
                 .id(displayId(o))
