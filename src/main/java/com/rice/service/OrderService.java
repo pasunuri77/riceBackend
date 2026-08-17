@@ -99,6 +99,8 @@ public class OrderService {
 
         order.setDeliveryStatus(next);
         Order saved = orderRepository.save(order);
+        // Guard against re-sending on a redundant update (admin re-saves the same
+        // status) - only a genuine transition should trigger a notification.
         if (previous != next) {
             sendStatusEmail(saved, next);
         }
@@ -213,7 +215,9 @@ public class OrderService {
             order.getItems().add(item);
         }
 
-        return toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        emailService.sendOrderPlaced(customer.getEmail(), customer.getName(), displayId(saved), saved.getAmount());
+        return toResponse(saved);
     }
 
     private BigDecimal lineTotal(OrderItemRequest item) {
@@ -384,11 +388,14 @@ public class OrderService {
     // order. Failures are logged, not thrown, and this runs after save() so the
     // status change is already committed by the time a mail failure could occur.
     private void sendStatusEmail(Order order, DeliveryStatus status) {
-        if (status == DeliveryStatus.PENDING) {
+        if (status == null || status == DeliveryStatus.PENDING) {
             return;
         }
         try {
             User customer = order.getCustomer();
+            if (customer == null) {
+                return;
+            }
             String email = customer.getEmail();
             String name = customer.getName();
             String orderId = displayId(order);

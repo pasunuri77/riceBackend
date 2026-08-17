@@ -30,6 +30,26 @@ public class EmailServiceImpl implements EmailService {
     private String supportEmail;
 
     @Override
+    public void sendWelcomeEmail(String email, String name) {
+        String safeName = escapeHtml(name);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:560px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#166534;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;color:#dcfce7;">Welcome aboard</p>
+                        </div>
+                        <div style="padding:32px;">
+                            <h2 style="margin-top:0;color:#111827;">You're all set, %s!</h2>
+                            <p style="color:#4b5563;line-height:24px;">You've registered on RiceBazaar successfully. You can now browse our rice selection, save addresses, and track your orders anytime from your account.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName);
+        sendEmail(email, "Welcome to RiceBazaar!", html);
+    }
+
+    @Override
     public void sendPin(String email, String pin) {
         String html = """
                 <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
@@ -167,6 +187,34 @@ public class EmailServiceImpl implements EmailService {
                 </div>
                 """.formatted(safeName, safeOrderId);
         sendEmail(email, "Your order has been cancelled", html);
+    }
+
+    @Override
+    public void sendOrderPlaced(String email, String customerName, String orderId, java.math.BigDecimal amount) {
+        String safeName = escapeHtml(customerName);
+        String safeOrderId = escapeHtml(orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:560px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#1d4ed8;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;">Order confirmation</p>
+                        </div>
+                        <div style="padding:32px;">
+                            <h2 style="margin-top:0;color:#111827;">Thanks for your order, %s!</h2>
+                            <p style="color:#4b5563;line-height:24px;">We've received your order and will notify you as it's processed and shipped.</p>
+                            <div style="margin:24px 0;padding:16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;">
+                                <p style="margin:0;color:#6b7280;font-size:13px;">Order</p>
+                                <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">%s</p>
+                                <p style="margin:8px 0 0;color:#6b7280;font-size:13px;">Total</p>
+                                <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">₹%s</p>
+                            </div>
+                            <p style="color:#6b7280;font-size:13px;">Track this order anytime from the "My Orders" section of your account.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName, safeOrderId, amount);
+        sendEmail(email, "Your RiceBazaar order " + orderId + " is confirmed", html);
     }
 
     @Override

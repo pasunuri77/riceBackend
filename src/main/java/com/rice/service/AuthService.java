@@ -11,6 +11,7 @@ import com.rice.dto.auth.ResetPasswordRequest;
 import com.rice.dto.auth.UserResponse;
 import com.rice.dto.auth.VerifyMobileOtpRequest;
 import com.rice.dto.auth.VerifyOtpRequest;
+import com.rice.email.EmailService;
 import com.rice.entity.User;
 import com.rice.entity.enums.OtpPurpose;
 import com.rice.entity.enums.Role;
@@ -35,6 +36,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final EmailOtpService emailOtpService;
+    private final EmailService emailService;
     private final TwilioVerifyService twilioVerifyService;
     private final CloudinaryService cloudinaryService;
 
@@ -118,6 +120,7 @@ public class AuthService {
                 .role(Role.USER)
                 .build();
         user = userRepository.save(user);
+        emailService.sendWelcomeEmail(user.getEmail(), user.getName());
 
         String token = jwtService.generateToken(new AppUserPrincipal(user));
         return AuthResponse.builder().token(token).user(toResponse(user)).build();
