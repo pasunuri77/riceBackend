@@ -245,6 +245,32 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(supportEmail, "RiceBazaar Contact: " + subject, html, name, email);
     }
 
+    @Override
+    public void sendInvitationEmail(String email, String name, String resetLink, String role) {
+        String safeName = escapeHtml(name);
+        String safeRole = escapeHtml(role);
+        String roleLabel = "staff".equalsIgnoreCase(role) || "employee".equalsIgnoreCase(role) ? "Team Member" : "Customer";
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:560px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#166534;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;color:#dcfce7;">You're invited to join us</p>
+                        </div>
+                        <div style="padding:32px;">
+                            <h2 style="margin-top:0;color:#111827;">Welcome to RiceBazaar, %s!</h2>
+                            <p style="color:#4b5563;line-height:24px;">You've been invited to join RiceBazaar as a %s. Click the link below to set up your password and get started.</p>
+                            <div style="text-align:center;margin:28px 0;">
+                                <a href="%s" style="display:inline-block;background:#166534;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;">Set Up Your Password</a>
+                            </div>
+                            <p style="color:#6b7280;font-size:13px;">This link expires in 24 hours. If you did not expect this invitation, you can ignore this email.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeName, roleLabel, resetLink);
+        sendEmail(email, "You're invited to RiceBazaar", html);
+    }
+
     private void sendEmail(String email, String subject, String html) {
         sendEmail(email, subject, html, null, null);
     }

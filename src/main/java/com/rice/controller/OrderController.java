@@ -1,5 +1,6 @@
 package com.rice.controller;
 
+import com.rice.dto.order.AdminOrderCreateRequest;
 import com.rice.dto.order.OrderCreateRequest;
 import com.rice.dto.order.OrderResponse;
 import com.rice.dto.order.UpdateOrderDeliveryInfoRequest;
@@ -43,6 +44,16 @@ public class OrderController {
         return orderService.listAll();
     }
 
+    @PatchMapping("/api/admin/orders/{id}/confirm")
+    public OrderResponse confirmOrder(@PathVariable String id) {
+        return orderService.confirmOrder(id);
+    }
+
+    @PostMapping("/api/admin/orders")
+    public OrderResponse createAdminOrder(@Valid @RequestBody AdminOrderCreateRequest request) {
+        return orderService.createAdminOrder(request);
+    }
+
     @PatchMapping("/api/admin/orders/{id}/payment-status")
     public OrderResponse updatePaymentStatus(@PathVariable String id, @Valid @RequestBody UpdateOrderStatusRequest request) {
         return orderService.updatePaymentStatus(id, request.getStatus());
@@ -54,7 +65,7 @@ public class OrderController {
     }
 
     @PatchMapping("/api/admin/orders/{id}/delivery-info")
-    public OrderResponse updateDeliveryInfo(@PathVariable String id, @Valid @RequestBody com.rice.dto.order.UpdateOrderDeliveryInfoRequest request) {
+    public OrderResponse updateDeliveryInfo(@PathVariable String id, @Valid @RequestBody UpdateOrderDeliveryInfoRequest request) {
         return orderService.updateDeliveryInfo(id, request);
     }
 }

@@ -10,6 +10,7 @@ import com.rice.entity.enums.DeliveryStatus;
 import com.rice.entity.enums.Role;
 import com.rice.repository.OrderRepository;
 import com.rice.repository.ProductRepository;
+import com.rice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,6 +30,7 @@ class OrderServiceEmailNotificationTest {
     private CouponService couponService;
     private EmailService emailService;
     private ProductAnalyticsService productAnalyticsService;
+    private UserRepository userRepository;
     private OrderService service;
 
     @BeforeEach
@@ -39,7 +41,8 @@ class OrderServiceEmailNotificationTest {
         couponService = mock(CouponService.class);
         emailService = mock(EmailService.class);
         productAnalyticsService = mock(ProductAnalyticsService.class);
-        service = new OrderService(orderRepository, productRepository, storeSettingsService, couponService, emailService, productAnalyticsService);
+        userRepository = mock(UserRepository.class);
+        service = new OrderService(orderRepository, productRepository, storeSettingsService, couponService, emailService, productAnalyticsService, userRepository);
     }
 
     @Test

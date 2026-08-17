@@ -1,5 +1,6 @@
 package com.rice.service;
 
+import com.rice.dto.order.AdminOrderCreateRequest;
 import com.rice.dto.order.OrderCreateRequest;
 import com.rice.dto.order.OrderItemRequest;
 import com.rice.dto.order.OrderResponse;
@@ -16,6 +17,7 @@ import com.rice.service.CouponService;
 import com.rice.exception.ApiException;
 import com.rice.repository.OrderRepository;
 import com.rice.repository.ProductRepository;
+import com.rice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ public class OrderService {
     private final CouponService couponService;
     private final EmailService emailService;
     private final com.rice.service.ProductAnalyticsService productAnalyticsService;
+    private final UserRepository userRepository;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
@@ -135,6 +138,139 @@ public class OrderService {
         order.setDeliveryStatus(DeliveryStatus.CANCELLED);
         Order saved = orderRepository.save(order);
         sendStatusEmail(saved, DeliveryStatus.CANCELLED);
+        return toResponse(saved);
+    }
+
+    /**
+     * Confirm (accept) an order. Only valid when delivery status is Pending.
+     * Transitions it to Processing and returns the updated order.
+     * Rejects with 409 if order isn't currently Pending.
+     */
+    @Transactional
+    public OrderResponse confirmOrder(String displayId) {
+        Order order = find(parseDisplayId(displayId));
+        
+        if (order.getDeliveryStatus() != DeliveryStatus.PENDING) {
+            throw ApiException.conflict("Order cannot be confirmed - expected status Pending, got " + 
+                order.getDeliveryStatus().name());
+        }
+        
+        order.setDeliveryStatus(DeliveryStatus.PROCESSING);
+        Order saved = orderRepository.save(order);
+        
+        // Send status email notification
+        sendStatusEmail(saved, DeliveryStatus.PROCESSING);
+        
+        return toResponse(saved);
+    }
+
+    /**
+     * Create an order on behalf of a customer (admin endpoint).
+     * Supports online and offline order types.
+     * Offline orders have no address and zero delivery charge.
+     * Online orders compute delivery charge normally.
+     */
+    @Transactional
+    public OrderResponse createAdminOrder(AdminOrderCreateRequest req) {
+        if (req.getItems() == null || req.getItems().isEmpty()) {
+            throw ApiException.badRequest("Cannot place an order with no items");
+        }
+
+        // Validate customer exists
+        User customer = userRepository.findById(req.getCustomerId())
+                .orElseThrow(() -> ApiException.badRequest("Customer not found: " + req.getCustomerId()));
+
+        // Validate order type
+        String orderType = req.getOrderType() == null ? "online" : req.getOrderType().toLowerCase();
+        if (!orderType.equals("online") && !orderType.equals("offline")) {
+            throw ApiException.badRequest("Invalid order type: " + req.getOrderType());
+        }
+
+        // For offline orders, address must be null and delivery charge is 0
+        if (orderType.equals("offline") && (req.getAddress() == null || req.getAddress().isBlank())) {
+            // This is expected for offline
+        } else if (orderType.equals("online") && (req.getAddress() == null || req.getAddress().isBlank())) {
+            throw ApiException.badRequest("Address is required for online orders");
+        }
+
+        BigDecimal subtotal = req.getItems().stream()
+                .map(this::lineTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Delivery charge is 0 for offline, computed normally for online
+        BigDecimal deliveryCharge = orderType.equals("offline") ? BigDecimal.ZERO : deliveryChargeFor(subtotal);
+
+        StoreSettings settings = storeSettingsService.current();
+        BigDecimal tax = subtotal.multiply(defaultMoney(settings.getTaxPercentage()))
+                .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        if (req.getCouponCode() != null && !req.getCouponCode().isBlank()) {
+            var validation = couponService.validateCoupon(req.getCouponCode(), subtotal);
+            if (!validation.isValid()) {
+                throw ApiException.badRequest(validation.getMessage());
+            }
+            discountAmount = validation.getDiscountAmount();
+        }
+
+        BigDecimal total = subtotal.subtract(discountAmount).add(deliveryCharge).add(tax);
+        if (total.compareTo(BigDecimal.ZERO) < 0) {
+            total = BigDecimal.ZERO;
+        }
+
+        PaymentMethod method = parsePaymentMethod(req.getPaymentMethod());
+        PaymentStatus paymentStatus = req.isMarkAsPaid() ? PaymentStatus.PAID : 
+            (method == PaymentMethod.COD ? PaymentStatus.PENDING : PaymentStatus.PAID);
+
+        Order order = Order.builder()
+                .customer(customer)
+                .addressSnapshot(req.getAddress())
+                .notes(req.getNotes())
+                .couponCode(req.getCouponCode() == null ? null : req.getCouponCode().trim().toUpperCase())
+                .discountAmount(discountAmount)
+                .subtotal(subtotal)
+                .tax(tax)
+                .deliveryCharge(deliveryCharge)
+                .offerDiscount(BigDecimal.ZERO)
+                .paymentMethod(method)
+                .paymentStatus(paymentStatus)
+                .amount(total)
+                .build();
+
+        for (OrderItemRequest itemReq : req.getItems()) {
+            if (itemReq.getId() == null) {
+                throw ApiException.badRequest("Order item is missing product id");
+            }
+            Product product = productRepository.findByIdForUpdate(itemReq.getId()).orElseThrow(
+                    () -> ApiException.badRequest("Product not found: " + itemReq.getId()));
+            int qty = itemReq.getQty() == null ? 0 : itemReq.getQty();
+            int weight = itemReq.getWeight() == null ? 0 : itemReq.getWeight();
+            if (qty <= 0) {
+                throw ApiException.badRequest("Order item quantity must be greater than zero");
+            }
+            if (weight <= 0) {
+                throw ApiException.badRequest("Order item weight must be specified");
+            }
+            int totalKg = weight * qty;
+            if (product.getStock() == null || product.getStock() < totalKg) {
+                throw ApiException.badRequest("Insufficient stock for product: " + product.getId());
+            }
+            decrementBagStock(product, weight, qty);
+
+            OrderItem item = OrderItem.builder()
+                    .order(order)
+                    .product(product)
+                    .productNameSnapshot(itemReq.getName())
+                    .imageSnapshot(itemReq.getImage())
+                    .weightKg(itemReq.getWeight())
+                    .qty(qty)
+                    .pricePerKgSnapshot(itemReq.getPricePerKg())
+                    .build();
+            order.getItems().add(item);
+        }
+
+        Order saved = orderRepository.save(order);
+        emailService.sendOrderPlaced(customer.getEmail(), customer.getName(), displayId(saved), saved.getAmount());
         return toResponse(saved);
     }
 

@@ -39,4 +39,9 @@ public interface EmailService {
             String email,
             String subject,
             String message);
+
+    /**
+     * Send password setup link for newly invited staff/customers
+     */
+    void sendInvitationEmail(String email, String name, String resetLink, String role);
 }
