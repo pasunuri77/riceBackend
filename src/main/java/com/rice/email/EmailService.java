@@ -1,5 +1,7 @@
 package com.rice.email;
 
+import com.rice.entity.Order;
+
 public interface EmailService {
 
     void sendWelcomeEmail(String email, String name);
@@ -12,7 +14,7 @@ public interface EmailService {
             String email,
             String otp);
 
-    void sendOrderPlaced(String email, String customerName, String orderId, java.math.BigDecimal amount);
+    void sendOrderPlaced(String email, Order order);
 
     void sendOrderAcceptedEmail(
             String email,
@@ -45,10 +47,6 @@ public interface EmailService {
      */
     void sendInvitationEmail(String email, String name, String resetLink, String role);
 
-    /**
-     * Send order placement notification to admin
-     */
-    void sendAdminOrderPlacedNotification(String customerName, String customerEmail, String orderId, java.math.BigDecimal amount);
 
     /**
      * Send order confirmation notification to admin

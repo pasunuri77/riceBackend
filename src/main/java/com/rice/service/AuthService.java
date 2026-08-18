@@ -27,6 +27,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.rice.repository.PasswordResetTokenRepository;
+import com.rice.entity.PasswordResetToken;
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -39,6 +43,7 @@ public class AuthService {
     private final EmailService emailService;
     private final TwilioVerifyService twilioVerifyService;
     private final CloudinaryService cloudinaryService;
+    private final PasswordResetTokenRepository tokenRepository;
 
     public AuthResponse login(LoginRequest request) {
         String email = emailOtpService.normalize(request.getEmail());
@@ -140,6 +145,27 @@ public class AuthService {
         emailOtpService.consumeOtp(email, request.getOtp(), OtpPurpose.PASSWORD_RESET);
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    @Transactional
+    public AuthResponse setPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> ApiException.badRequest("Invalid or expired link"));
+
+        if (resetToken.getExpiresAt().isBefore(Instant.now())) {
+            throw ApiException.badRequest("Invalid or expired link");
+        }
+
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setPasswordSet(true);
+        user.setStatus(com.rice.entity.enums.UserStatus.ACTIVE);
+        
+        user = userRepository.save(user);
+        tokenRepository.deleteByUser(user);
+
+        String jwtToken = jwtService.generateToken(new AppUserPrincipal(user));
+        return AuthResponse.builder().token(jwtToken).user(toResponse(user)).build();
     }
 
     @Transactional

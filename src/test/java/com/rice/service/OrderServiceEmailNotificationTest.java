@@ -130,6 +130,6 @@ class OrderServiceEmailNotificationTest {
 
         service.create(customer, req);
 
-        verify(emailService).sendOrderPlaced("eve@example.com", "Eve", "ORD10101", new BigDecimal("1240.00"));
+        verify(emailService).sendOrderPlaced(eq("eve@example.com"), any(Order.class));
     }
 }

@@ -1,5 +1,7 @@
 package com.rice.email;
 
+import com.rice.entity.Order;
+import com.rice.entity.OrderItem;
 import com.rice.exception.ApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -31,6 +33,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${app.admin.email:${app.email.sender-email:pasunurisagar2001@gmail.com}}")
     private String adminEmail;
+
+    @Value("${app.frontend.base-url:http://localhost:5173}")
+    private String frontendBaseUrl;
 
     @Override
     public void sendWelcomeEmail(String email, String name) {
@@ -193,12 +198,32 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendOrderPlaced(String email, String customerName, String orderId, java.math.BigDecimal amount) {
-        String safeName = escapeHtml(customerName);
-        String safeOrderId = escapeHtml(orderId);
+    public void sendOrderPlaced(String email, Order order) {
+        String safeName = escapeHtml(order.getCustomer().getName());
+        String safeOrderId = escapeHtml(displayId(order));
+        
+        // Build items HTML
+        StringBuilder itemsHtml = new StringBuilder();
+        for (OrderItem item : order.getItems()) {
+            String itemName = escapeHtml(item.getProductNameSnapshot());
+            int totalKg = item.getWeightKg() * item.getQty();
+            itemsHtml.append(String.format("""
+                    <tr style="border-bottom:1px solid #e5e7eb;">
+                        <td style="padding:12px 0;color:#111827;font-weight:500;">%s</td>
+                        <td style="padding:12px 0;text-align:right;color:#6b7280;">%dkg x %d</td>
+                        <td style="padding:12px 0;text-align:right;color:#111827;font-weight:600;">$%.2f</td>
+                    </tr>
+                    """, itemName, item.getWeightKg(), item.getQty(), item.getPricePerKgSnapshot().multiply(java.math.BigDecimal.valueOf(totalKg))));
+        }
+        
+        String orderPageLink = frontendBaseUrl + "/dashboard/orders/" + displayId(order);
+        String addressDisplay = order.getAddressSnapshot() != null && !order.getAddressSnapshot().isEmpty() 
+            ? escapeHtml(order.getAddressSnapshot()) 
+            : "No address provided";
+        
         String html = """
                 <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
-                    <div style="max-width:560px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                    <div style="max-width:640px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
                         <div style="background:#1d4ed8;color:white;padding:28px;text-align:center;">
                             <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
                             <p style="margin:8px 0 0;">Order confirmation</p>
@@ -206,18 +231,90 @@ public class EmailServiceImpl implements EmailService {
                         <div style="padding:32px;">
                             <h2 style="margin-top:0;color:#111827;">Thanks for your order, %s!</h2>
                             <p style="color:#4b5563;line-height:24px;">We've received your order and will notify you as it's processed and shipped.</p>
+                            
+                            <!-- Order Info Box -->
                             <div style="margin:24px 0;padding:16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;">
-                                <p style="margin:0;color:#6b7280;font-size:13px;">Order</p>
-                                <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">%s</p>
-                                <p style="margin:8px 0 0;color:#6b7280;font-size:13px;">Total</p>
-                                <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">$%s</p>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                                    <div>
+                                        <p style="margin:0;color:#6b7280;font-size:13px;">Order ID</p>
+                                        <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:16px;">%s</p>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <p style="margin:0;color:#6b7280;font-size:13px;">Order Date</p>
+                                        <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:16px;">%s</p>
+                                    </div>
+                                </div>
                             </div>
-                            <p style="color:#6b7280;font-size:13px;">Track this order anytime from the "My Orders" section of your account.</p>
+                            
+                            <!-- Order Items -->
+                            <div style="margin:24px 0;">
+                                <h3 style="margin:0 0 12px;color:#111827;font-size:14px;font-weight:600;">Order Details</h3>
+                                <table style="width:100%%;border-collapse:collapse;">
+                                    <thead>
+                                        <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb;">
+                                            <th style="padding:12px 0;text-align:left;color:#6b7280;font-weight:600;font-size:13px;">Product</th>
+                                            <th style="padding:12px 0;text-align:right;color:#6b7280;font-weight:600;font-size:13px;">Quantity</th>
+                                            <th style="padding:12px 0;text-align:right;color:#6b7280;font-weight:600;font-size:13px;">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        %s
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Price Breakdown -->
+                            <div style="margin:24px 0;padding:16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                    <span style="color:#6b7280;">Subtotal</span>
+                                    <span style="color:#111827;font-weight:500;">$%.2f</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                    <span style="color:#6b7280;">Delivery Fee</span>
+                                    <span style="color:#111827;font-weight:500;">$%.2f</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+                                    <span style="color:#6b7280;">Tax</span>
+                                    <span style="color:#111827;font-weight:500;">$%.2f</span>
+                                </div>
+                                %s
+                                <div style="display:flex;justify-content:space-between;padding-top:12px;border-top:2px solid #e5e7eb;">
+                                    <span style="color:#111827;font-weight:700;font-size:16px;">Total</span>
+                                    <span style="color:#1d4ed8;font-weight:700;font-size:16px;">$%.2f</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Delivery Address -->
+                            <div style="margin:24px 0;padding:16px;background:#f0f9ff;border:1px solid #bfdbfe;border-radius:10px;">
+                                <p style="margin:0;color:#1e40af;font-weight:600;font-size:14px;">Delivery Address</p>
+                                <p style="margin:8px 0 0;color:#1e40af;font-size:14px;line-height:20px;">%s</p>
+                            </div>
+                            
+                            <!-- View Order Button -->
+                            <div style="margin:28px 0;text-align:center;">
+                                <a href="%s" style="display:inline-block;padding:12px 32px;background:#1d4ed8;color:white;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">View Order Details</a>
+                            </div>
+                            
+                            <p style="color:#6b7280;font-size:13px;margin-top:24px;">Track this order anytime from the "My Orders" section of your account.</p>
                         </div>
                     </div>
                 </div>
-                """.formatted(safeName, safeOrderId, amount);
-        sendEmail(email, "Your RiceBazaar order " + orderId + " is confirmed", html);
+                """.formatted(
+                    safeName,
+                    safeOrderId,
+                    java.time.format.DateTimeFormatter.ISO_LOCAL_DATE.format(order.getCreatedAt().atZone(java.time.ZoneOffset.UTC)),
+                    itemsHtml.toString(),
+                    order.getSubtotal(),
+                    order.getDeliveryCharge(),
+                    order.getTax(),
+                    order.getDiscountAmount().compareTo(java.math.BigDecimal.ZERO) > 0 
+                        ? String.format("<div style=\"display:flex;justify-content:space-between;margin-bottom:8px;\"><span style=\"color:#059669;\">Discount</span><span style=\"color:#059669;font-weight:500;\">-$%.2f</span></div>", order.getDiscountAmount())
+                        : "",
+                    order.getAmount(),
+                    addressDisplay,
+                    orderPageLink);
+        sendEmail(email, "Your RiceBazaar order " + safeOrderId + " is confirmed", html);
+        sendEmail(adminEmail, "[ADMIN] New Order Received: " + safeOrderId, html);
     }
 
     @Override
@@ -274,34 +371,6 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, "You're invited to RiceBazaar", html);
     }
 
-    @Override
-    public void sendAdminOrderPlacedNotification(String customerName, String customerEmail, String orderId, java.math.BigDecimal amount) {
-        String safeName = escapeHtml(customerName);
-        String safeEmail = escapeHtml(customerEmail);
-        String safeOrderId = escapeHtml(orderId);
-        String html = """
-                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
-                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
-                        <div style="background:#dc2626;color:white;padding:28px;text-align:center;">
-                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
-                            <p style="margin:8px 0 0;color:#fee2e2;">New Order Received</p>
-                        </div>
-                        <div style="padding:32px;color:#111827;">
-                            <h2 style="margin-top:0;">New Order Alert</h2>
-                            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;margin:16px 0;">
-                                <p style="margin:0;"><strong>Order ID:</strong> %s</p>
-                                <p style="margin:8px 0 0;"><strong>Customer:</strong> %s</p>
-                                <p style="margin:8px 0 0;"><strong>Email:</strong> %s</p>
-                                <p style="margin:8px 0 0;"><strong>Total Amount:</strong> $%s</p>
-                            </div>
-                            <p style="color:#6b7280;line-height:24px;">A new order has been placed and is awaiting confirmation. Please review and process this order at your earliest convenience.</p>
-                            <p style="color:#6b7280;font-size:13px;margin-bottom:0;">Log in to your admin dashboard to view order details.</p>
-                        </div>
-                    </div>
-                </div>
-                """.formatted(safeOrderId, safeName, safeEmail, amount);
-        sendEmail(adminEmail, "[ADMIN] New Order: " + orderId, html);
-    }
 
     @Override
     public void sendAdminOrderConfirmedNotification(String customerName, String orderId) {
@@ -452,5 +521,9 @@ public class EmailServiceImpl implements EmailService {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    private String displayId(Order order) {
+        return "ORD" + (10000 + order.getId());
     }
 }

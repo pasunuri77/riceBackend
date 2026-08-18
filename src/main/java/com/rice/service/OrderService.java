@@ -55,10 +55,10 @@ public class OrderService {
         return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream().map(this::toResponse).toList();
     }
 
-    public OrderResponse getById(Long id, User currentUser) {
-        Order order = find(id);
+    public OrderResponse getById(String displayId, User currentUser) {
+        Order order = find(parseDisplayId(displayId));
         if (!isAdmin(currentUser) && !order.getCustomer().getId().equals(currentUser.getId())) {
-            throw ApiException.notFound("Order not found: " + id);
+            throw ApiException.notFound("Order not found: " + displayId);
         }
         return toResponse(order);
     }
@@ -271,8 +271,7 @@ public class OrderService {
         }
 
         Order saved = orderRepository.save(order);
-        emailService.sendOrderPlaced(customer.getEmail(), customer.getName(), displayId(saved), saved.getAmount());
-        emailService.sendAdminOrderPlacedNotification(customer.getName(), customer.getEmail(), displayId(saved), saved.getAmount());
+        emailService.sendOrderPlaced(customer.getEmail(), saved);
         return toResponse(saved);
     }
 
@@ -354,8 +353,7 @@ public class OrderService {
         }
 
         Order saved = orderRepository.save(order);
-        emailService.sendOrderPlaced(customer.getEmail(), customer.getName(), displayId(saved), saved.getAmount());
-        emailService.sendAdminOrderPlacedNotification(customer.getName(), customer.getEmail(), displayId(saved), saved.getAmount());
+        emailService.sendOrderPlaced(customer.getEmail(), saved);
         return toResponse(saved);
     }
 

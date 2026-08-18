@@ -67,6 +67,11 @@ public class AuthController {
         return new MessageResponse("Password reset successfully");
     }
 
+    @PostMapping("/set-password")
+    public AuthResponse setPassword(@Valid @RequestBody com.rice.dto.auth.SetPasswordRequest request) {
+        return authService.setPassword(request.getToken(), request.getPassword());
+    }
+
     @PostMapping("/logout")
     public void logout() {
         // JWTs are stateless - logout is handled client-side by discarding the token.

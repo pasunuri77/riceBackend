@@ -246,7 +246,7 @@ public class StaffService {
                 .role(user.getRole().name().toLowerCase())
                 .status(user.getStatus().name())
                 .joined(DateTimeFormatter.ISO_LOCAL_DATE.format(user.getCreatedAt().atZone(ZoneOffset.UTC)))
-                .pendingSetup(false)  // Could check if password is still temp, but keeping simple
+                .pendingSetup(!user.isPasswordSet())
                 .build();
     }
 
