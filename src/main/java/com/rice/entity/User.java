@@ -35,9 +35,13 @@ public class User {
     @Builder.Default
     private boolean mobileVerified = false;
 
-    @Column(name = "password_set", nullable = false)
+    @Column(name = "password_set")
     @Builder.Default
-    private boolean passwordSet = false;
+    private Boolean passwordSet = false;
+
+    public boolean isPasswordSet() {
+        return Boolean.TRUE.equals(passwordSet);
+    }
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

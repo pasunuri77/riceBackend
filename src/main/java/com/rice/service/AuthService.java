@@ -123,6 +123,7 @@ public class AuthService {
                 .mobileVerified(twilioVerifyService.isConfigured() && twilioVerifyService.isPhoneVerified(phone))
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .passwordSet(true)
                 .build();
         user = userRepository.save(user);
         emailService.sendWelcomeEmail(user.getEmail(), user.getName());
