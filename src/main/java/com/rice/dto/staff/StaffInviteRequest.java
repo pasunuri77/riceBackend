@@ -23,8 +23,7 @@ public class StaffInviteRequest {
     @NotBlank(message = "Email is required")
     private String email;
     
-    @NotBlank(message = "Mobile is required")
-    private String mobile;
+    private String mobile;  // Optional - frontend labels as "Mobile (optional)"
     
     @NotNull(message = "Role is required")
     private String role;  // "admin" or "employee"

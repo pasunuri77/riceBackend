@@ -46,6 +46,10 @@ public class Order {
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
+    @Column(name = "order_type", nullable = false, columnDefinition = "varchar(20) default 'online'")
+    @Builder.Default
+    private String orderType = "online";
+
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     @Builder.Default

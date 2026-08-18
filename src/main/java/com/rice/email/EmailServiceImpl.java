@@ -29,6 +29,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.contact.support-email:${app.email.sender-email:pasunurisagar2001@gmail.com}}")
     private String supportEmail;
 
+    @Value("${app.admin.email:${app.email.sender-email:pasunurisagar2001@gmail.com}}")
+    private String adminEmail;
+
     @Override
     public void sendWelcomeEmail(String email, String name) {
         String safeName = escapeHtml(name);
@@ -207,7 +210,7 @@ public class EmailServiceImpl implements EmailService {
                                 <p style="margin:0;color:#6b7280;font-size:13px;">Order</p>
                                 <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">%s</p>
                                 <p style="margin:8px 0 0;color:#6b7280;font-size:13px;">Total</p>
-                                <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">₹%s</p>
+                                <p style="margin:4px 0 0;color:#111827;font-weight:700;font-size:18px;">$%s</p>
                             </div>
                             <p style="color:#6b7280;font-size:13px;">Track this order anytime from the "My Orders" section of your account.</p>
                         </div>
@@ -269,6 +272,143 @@ public class EmailServiceImpl implements EmailService {
                 </div>
                 """.formatted(safeName, roleLabel, resetLink);
         sendEmail(email, "You're invited to RiceBazaar", html);
+    }
+
+    @Override
+    public void sendAdminOrderPlacedNotification(String customerName, String customerEmail, String orderId, java.math.BigDecimal amount) {
+        String safeName = escapeHtml(customerName);
+        String safeEmail = escapeHtml(customerEmail);
+        String safeOrderId = escapeHtml(orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#dc2626;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;color:#fee2e2;">New Order Received</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;">
+                            <h2 style="margin-top:0;">New Order Alert</h2>
+                            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;margin:16px 0;">
+                                <p style="margin:0;"><strong>Order ID:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Customer:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Email:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Total Amount:</strong> $%s</p>
+                            </div>
+                            <p style="color:#6b7280;line-height:24px;">A new order has been placed and is awaiting confirmation. Please review and process this order at your earliest convenience.</p>
+                            <p style="color:#6b7280;font-size:13px;margin-bottom:0;">Log in to your admin dashboard to view order details.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeOrderId, safeName, safeEmail, amount);
+        sendEmail(adminEmail, "[ADMIN] New Order: " + orderId, html);
+    }
+
+    @Override
+    public void sendAdminOrderConfirmedNotification(String customerName, String orderId) {
+        String safeName = escapeHtml(customerName);
+        String safeOrderId = escapeHtml(orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#166534;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;color:#dcfce7;">Order Confirmed</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;">
+                            <h2 style="margin-top:0;">Order Confirmed</h2>
+                            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin:16px 0;">
+                                <p style="margin:0;"><strong>Order ID:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Customer:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Status:</strong> Confirmed</p>
+                            </div>
+                            <p style="color:#6b7280;line-height:24px;">Order has been confirmed and is now ready for processing and shipment.</p>
+                            <p style="color:#6b7280;font-size:13px;margin-bottom:0;">Customer has been notified about the confirmation.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeOrderId, safeName);
+        sendEmail(adminEmail, "[ADMIN] Order Confirmed: " + orderId, html);
+    }
+
+    @Override
+    public void sendAdminOrderShippedNotification(String customerName, String orderId) {
+        String safeName = escapeHtml(customerName);
+        String safeOrderId = escapeHtml(orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#1d4ed8;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;color:#dbeafe;">Order Shipped</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;">
+                            <h2 style="margin-top:0;">Order Shipped</h2>
+                            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px;margin:16px 0;">
+                                <p style="margin:0;"><strong>Order ID:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Customer:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Status:</strong> Shipped</p>
+                            </div>
+                            <p style="color:#6b7280;line-height:24px;">Order has been shipped and is on its way to the customer.</p>
+                            <p style="color:#6b7280;font-size:13px;margin-bottom:0;">Customer has been notified about the shipment.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeOrderId, safeName);
+        sendEmail(adminEmail, "[ADMIN] Order Shipped: " + orderId, html);
+    }
+
+    @Override
+    public void sendAdminOrderDeliveredNotification(String customerName, String orderId) {
+        String safeName = escapeHtml(customerName);
+        String safeOrderId = escapeHtml(orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#0f766e;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;color:#ccfbf1;">Order Delivered</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;">
+                            <h2 style="margin-top:0;">Order Delivered</h2>
+                            <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:10px;padding:16px;margin:16px 0;">
+                                <p style="margin:0;"><strong>Order ID:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Customer:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Status:</strong> Delivered</p>
+                            </div>
+                            <p style="color:#6b7280;line-height:24px;">Order has been successfully delivered to the customer.</p>
+                            <p style="color:#6b7280;font-size:13px;margin-bottom:0;">Customer has been notified about the delivery.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeOrderId, safeName);
+        sendEmail(adminEmail, "[ADMIN] Order Delivered: " + orderId, html);
+    }
+
+    @Override
+    public void sendAdminOrderCancelledNotification(String customerName, String orderId) {
+        String safeName = escapeHtml(customerName);
+        String safeOrderId = escapeHtml(orderId);
+        String html = """
+                <div style="background:#f6f7f2;padding:32px 16px;font-family:Segoe UI,Arial,sans-serif;">
+                    <div style="max-width:600px;margin:auto;background:white;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+                        <div style="background:#991b1b;color:white;padding:28px;text-align:center;">
+                            <h1 style="margin:0;font-size:24px;">RiceBazaar</h1>
+                            <p style="margin:8px 0 0;color:#fee2e2;">Order Cancelled</p>
+                        </div>
+                        <div style="padding:32px;color:#111827;">
+                            <h2 style="margin-top:0;">Order Cancelled</h2>
+                            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;margin:16px 0;">
+                                <p style="margin:0;"><strong>Order ID:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Customer:</strong> %s</p>
+                                <p style="margin:8px 0 0;"><strong>Status:</strong> Cancelled</p>
+                            </div>
+                            <p style="color:#6b7280;line-height:24px;">Order has been cancelled.</p>
+                            <p style="color:#6b7280;font-size:13px;margin-bottom:0;">Customer has been notified about the cancellation.</p>
+                        </div>
+                    </div>
+                </div>
+                """.formatted(safeOrderId, safeName);
+        sendEmail(adminEmail, "[ADMIN] Order Cancelled: " + orderId, html);
     }
 
     private void sendEmail(String email, String subject, String html) {

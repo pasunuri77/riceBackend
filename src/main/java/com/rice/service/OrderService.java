@@ -232,6 +232,7 @@ public class OrderService {
                 .tax(tax)
                 .deliveryCharge(deliveryCharge)
                 .offerDiscount(BigDecimal.ZERO)
+                .orderType(orderType)
                 .paymentMethod(method)
                 .paymentStatus(paymentStatus)
                 .amount(total)
@@ -271,6 +272,7 @@ public class OrderService {
 
         Order saved = orderRepository.save(order);
         emailService.sendOrderPlaced(customer.getEmail(), customer.getName(), displayId(saved), saved.getAmount());
+        emailService.sendAdminOrderPlacedNotification(customer.getName(), customer.getEmail(), displayId(saved), saved.getAmount());
         return toResponse(saved);
     }
 
@@ -353,6 +355,7 @@ public class OrderService {
 
         Order saved = orderRepository.save(order);
         emailService.sendOrderPlaced(customer.getEmail(), customer.getName(), displayId(saved), saved.getAmount());
+        emailService.sendAdminOrderPlacedNotification(customer.getName(), customer.getEmail(), displayId(saved), saved.getAmount());
         return toResponse(saved);
     }
 
@@ -536,10 +539,22 @@ public class OrderService {
             String name = customer.getName();
             String orderId = displayId(order);
             switch (status) {
-                case PROCESSING -> emailService.sendOrderAcceptedEmail(email, name, orderId);
-                case SHIPPED -> emailService.sendOrderShippedEmail(email, name, orderId);
-                case DELIVERED -> emailService.sendOrderDeliveredEmail(email, name, orderId);
-                case CANCELLED -> emailService.sendOrderCancelledEmail(email, name, orderId);
+                case PROCESSING -> {
+                    emailService.sendOrderAcceptedEmail(email, name, orderId);
+                    emailService.sendAdminOrderConfirmedNotification(name, orderId);
+                }
+                case SHIPPED -> {
+                    emailService.sendOrderShippedEmail(email, name, orderId);
+                    emailService.sendAdminOrderShippedNotification(name, orderId);
+                }
+                case DELIVERED -> {
+                    emailService.sendOrderDeliveredEmail(email, name, orderId);
+                    emailService.sendAdminOrderDeliveredNotification(name, orderId);
+                }
+                case CANCELLED -> {
+                    emailService.sendOrderCancelledEmail(email, name, orderId);
+                    emailService.sendAdminOrderCancelledNotification(name, orderId);
+                }
                 case PENDING -> { /* not a notifiable transition, guarded above */ }
             }
         } catch (Exception e) {
@@ -589,6 +604,8 @@ public class OrderService {
                 .quantity(quantity)
                 .amount(o.getAmount())
                 .paymentStatus(capitalize(o.getPaymentStatus().name()))
+                .paymentMethod(o.getPaymentMethod() != null ? o.getPaymentMethod().name() : null)
+                .orderType(o.getOrderType())
                 .deliveryStatus(capitalize(o.getDeliveryStatus().name()))
                 .date(DATE_FORMAT.format(o.getCreatedAt().atZone(ZoneOffset.UTC)))
                 .items(itemResponses)

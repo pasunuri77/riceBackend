@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -244,7 +245,7 @@ public class StaffService {
                 .mobile(user.getPhone())
                 .role(user.getRole().name().toLowerCase())
                 .status(user.getStatus().name())
-                .joined(DateTimeFormatter.ISO_LOCAL_DATE.format(user.getCreatedAt()))
+                .joined(DateTimeFormatter.ISO_LOCAL_DATE.format(user.getCreatedAt().atZone(ZoneOffset.UTC)))
                 .pendingSetup(false)  // Could check if password is still temp, but keeping simple
                 .build();
     }

@@ -35,6 +35,8 @@ public class OrderResponse {
     private String quantity;
     private BigDecimal amount;
     private String paymentStatus;
+    private String paymentMethod;
+    private String orderType;
     private String deliveryStatus;
     private String date;
     private List<ItemResponse> items;

@@ -44,4 +44,29 @@ public interface EmailService {
      * Send password setup link for newly invited staff/customers
      */
     void sendInvitationEmail(String email, String name, String resetLink, String role);
+
+    /**
+     * Send order placement notification to admin
+     */
+    void sendAdminOrderPlacedNotification(String customerName, String customerEmail, String orderId, java.math.BigDecimal amount);
+
+    /**
+     * Send order confirmation notification to admin
+     */
+    void sendAdminOrderConfirmedNotification(String customerName, String orderId);
+
+    /**
+     * Send order shipped notification to admin
+     */
+    void sendAdminOrderShippedNotification(String customerName, String orderId);
+
+    /**
+     * Send order delivered notification to admin
+     */
+    void sendAdminOrderDeliveredNotification(String customerName, String orderId);
+
+    /**
+     * Send order cancelled notification to admin
+     */
+    void sendAdminOrderCancelledNotification(String customerName, String orderId);
 }
