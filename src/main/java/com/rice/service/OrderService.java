@@ -536,7 +536,7 @@ public class OrderService {
             String orderId = displayId(order);
             switch (status) {
                 case PROCESSING -> {
-                    emailService.sendOrderAcceptedEmail(email, name, orderId);
+                    emailService.sendOrderAcceptedEmail(email, order);
                     emailService.sendAdminOrderConfirmedNotification(name, orderId);
                 }
                 case SHIPPED -> {

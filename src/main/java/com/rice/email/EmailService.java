@@ -14,12 +14,9 @@ public interface EmailService {
             String email,
             String otp);
 
-    void sendOrderPlaced(String email, Order order);
-
     void sendOrderAcceptedEmail(
             String email,
-            String customerName,
-            String orderId);
+            Order order);
 
     void sendOrderShippedEmail(
             String email,
