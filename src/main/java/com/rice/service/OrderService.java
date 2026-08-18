@@ -271,7 +271,6 @@ public class OrderService {
         }
 
         Order saved = orderRepository.save(order);
-        emailService.sendOrderPlaced(customer.getEmail(), saved);
         return toResponse(saved);
     }
 
@@ -353,7 +352,6 @@ public class OrderService {
         }
 
         Order saved = orderRepository.save(order);
-        emailService.sendOrderPlaced(customer.getEmail(), saved);
         return toResponse(saved);
     }
 
