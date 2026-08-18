@@ -55,12 +55,10 @@ class OrderServiceEmailNotificationTest {
         service.updateDeliveryStatus("ORD10042", "PROCESSING");
 
         ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> nameCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> orderIdCaptor = ArgumentCaptor.forClass(String.class);
-        verify(emailService).sendOrderAcceptedEmail(emailCaptor.capture(), nameCaptor.capture(), orderIdCaptor.capture());
+        ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+        verify(emailService).sendOrderAcceptedEmail(emailCaptor.capture(), orderCaptor.capture());
         assertEquals("alice@example.com", emailCaptor.getValue());
-        assertEquals("Alice", nameCaptor.getValue());
-        assertEquals("ORD10042", orderIdCaptor.getValue());
+        assertEquals(42L, orderCaptor.getValue().getId());
     }
 
     @Test
@@ -72,7 +70,7 @@ class OrderServiceEmailNotificationTest {
 
         service.updateDeliveryStatus("ORD10043", "SHIPPED");
 
-        verify(emailService).sendOrderShippedEmail("bob@example.com", "Bob", "ORD10043");
+        verify(emailService).sendOrderShippedEmail(eq("bob@example.com"), eq("Bob"), argThat(s -> s.endsWith("-10043")));
     }
 
     @Test
@@ -84,7 +82,7 @@ class OrderServiceEmailNotificationTest {
 
         service.updateDeliveryStatus("ORD10044", "DELIVERED");
 
-        verify(emailService).sendOrderDeliveredEmail("cara@example.com", "Cara", "ORD10044");
+        verify(emailService).sendOrderDeliveredEmail(eq("cara@example.com"), eq("Cara"), argThat(s -> s.endsWith("-10044")));
     }
 
     @Test
@@ -96,7 +94,7 @@ class OrderServiceEmailNotificationTest {
 
         service.updateDeliveryStatus("ORD10045", "CANCELLED");
 
-        verify(emailService).sendOrderCancelledEmail("dana@example.com", "Dana", "ORD10045");
+        verify(emailService).sendOrderCancelledEmail(eq("dana@example.com"), eq("Dana"), argThat(s -> s.endsWith("-10045")));
     }
 
 

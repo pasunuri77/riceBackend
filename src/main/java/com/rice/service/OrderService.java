@@ -495,11 +495,25 @@ public class OrderService {
     }
 
     private Long parseDisplayId(String displayId) {
-        if (displayId == null || !displayId.toUpperCase(Locale.ROOT).startsWith("ORD")) {
+        if (displayId == null) {
             throw ApiException.badRequest("Invalid order id: " + displayId);
         }
+        
+        String upperId = displayId.toUpperCase(Locale.ROOT);
         try {
-            long displayNumber = Long.parseLong(displayId.substring(3));
+            long displayNumber;
+            if (upperId.startsWith("ORD")) {
+                displayNumber = Long.parseLong(upperId.substring(3));
+            } else if (upperId.startsWith("RBZ-") || upperId.startsWith("OFF-")) {
+                int lastDash = upperId.lastIndexOf("-");
+                if (lastDash == -1 || lastDash < 4) {
+                    throw ApiException.badRequest("Invalid order id: " + displayId);
+                }
+                displayNumber = Long.parseLong(upperId.substring(lastDash + 1));
+            } else {
+                throw ApiException.badRequest("Invalid order id: " + displayId);
+            }
+            
             long dbId = displayNumber - 10000;
             if (dbId <= 0) {
                 throw ApiException.badRequest("Invalid order id: " + displayId);
@@ -515,7 +529,9 @@ public class OrderService {
     }
 
     private String displayId(Order order) {
-        return "ORD" + (10000 + order.getId());
+        String prefix = "offline".equalsIgnoreCase(order.getOrderType()) ? "OFF-" : "RBZ-";
+        int year = order.getCreatedAt() != null ? order.getCreatedAt().atZone(java.time.ZoneOffset.UTC).getYear() : java.time.Year.now().getValue();
+        return prefix + year + "-" + (10000 + order.getId());
     }
 
     // Best-effort: an email provider outage must never fail (or roll back) the

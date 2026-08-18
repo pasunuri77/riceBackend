@@ -502,6 +502,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private String displayId(Order order) {
-        return "ORD" + (10000 + order.getId());
+        String prefix = "offline".equalsIgnoreCase(order.getOrderType()) ? "OFF-" : "RBZ-";
+        int year = order.getCreatedAt() != null ? order.getCreatedAt().atZone(java.time.ZoneOffset.UTC).getYear() : java.time.Year.now().getValue();
+        return prefix + year + "-" + (10000 + order.getId());
     }
 }

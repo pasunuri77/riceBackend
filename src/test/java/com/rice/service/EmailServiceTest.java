@@ -53,7 +53,7 @@ class EmailServiceTest {
 
         // The RestTemplate network call will fail in unit test because api-key is fake, but formatting must succeed without UnknownFormatConversionException
         try {
-            emailService.sendOrderPlaced("sagar@example.com", order);
+            emailService.sendOrderAcceptedEmail("sagar@example.com", order);
         } catch (Exception ex) {
             // Should not be UnknownFormatConversionException
             org.junit.jupiter.api.Assertions.assertFalse(
