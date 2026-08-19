@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class OrderCreateRequest {
     private String address;
+    private String deliveryZipCode;
     private String paymentMethod;
     private String couponCode;
     private String notes;

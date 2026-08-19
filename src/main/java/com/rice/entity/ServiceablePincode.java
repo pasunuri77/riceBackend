@@ -18,4 +18,26 @@ public class ServiceablePincode {
 
     @Column(nullable = false, unique = true)
     private String pincode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "zone_id")
+    private DeliveryZone zone;
+
+    @org.hibernate.annotations.ColumnDefault("true")
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
+
+    @org.hibernate.annotations.ColumnDefault("false")
+    @Column(name = "is_named_zone", nullable = false)
+    @Builder.Default
+    private boolean isNamedZone = false;
+    
+    // For backward compatibility constructors
+    public ServiceablePincode(Long id, String pincode) {
+        this.id = id;
+        this.pincode = pincode;
+        this.active = true;
+        this.isNamedZone = false;
+    }
 }

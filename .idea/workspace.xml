@@ -6,10 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="cd1d9a22-6fbc-424b-b632-d34c8fa25317" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/email/EmailServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/controller/DeliveryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/controller/DeliveryController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/delivery/ServiceabilityResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/delivery/ServiceabilityResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/AdminOrderCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/AdminOrderCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/dto/order/OrderCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/entity/ServiceablePincode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/entity/ServiceablePincode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/DeliveryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/DeliveryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/rice/service/OrderService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/rice/service/DeliveryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/rice/service/DeliveryServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/rice/service/OrderServiceEmailNotificationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/rice/service/OrderServiceEmailNotificationTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +24,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="168" />
+    <option name="cachedIndexableFilesCount" value="173" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -43,23 +50,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0024893819682048" />
-      <entry key="MS500" value="1.3671031535483298" />
-      <entry key="S2" value="4.389286232310674" />
-      <entry key="S5" value="11.216911021649478" />
-      <entry key="S10" value="21.813163921461374" />
-      <entry key="S30" value="52.54411968272073" />
-      <entry key="S60" value="83.69196477816247" />
-      <entry key="M2" value="115.48156986155405" />
-      <entry key="M5" value="148.31698723608847" />
-      <entry key="M10" value="172.09787404024536" />
-      <entry key="M15" value="188.0468150547676" />
-      <entry key="M30" value="224.5462275235069" />
-      <entry key="H1" value="313.9679653133977" />
-      <entry key="H2" value="543.2232651462961" />
-      <entry key="H4" value="877.8026189900659" />
-      <entry key="D1" value="1469.0555281116033" />
-      <entry key="W1" value="1619.9723914135668" />
+      <entry key="MS100" value="1.0007822950521148" />
+      <entry key="MS500" value="1.2587520091422748" />
+      <entry key="S2" value="3.0201593857629336" />
+      <entry key="S5" value="6.649454266783109" />
+      <entry key="S10" value="12.417898746701685" />
+      <entry key="S30" value="25.24146800836917" />
+      <entry key="S60" value="33.6770968191352" />
+      <entry key="M2" value="41.036423506607285" />
+      <entry key="M5" value="47.463633217069464" />
+      <entry key="M10" value="51.682310779864906" />
+      <entry key="M15" value="60.01925227487727" />
+      <entry key="M30" value="106.18993471225859" />
+      <entry key="H1" value="215.67799008326432" />
+      <entry key="H2" value="451.18316600655686" />
+      <entry key="H4" value="815.022753559508" />
+      <entry key="D1" value="1530.079229109834" />
+      <entry key="W1" value="1724.6932230703324" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -81,23 +88,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.04152200425260383" />
-      <entry key="MS500" value="0.6503140397014132" />
-      <entry key="S2" value="3.9791458235112245" />
-      <entry key="S5" value="11.000818818795473" />
-      <entry key="S10" value="21.672827059526846" />
-      <entry key="S30" value="52.46151437554725" />
-      <entry key="S60" value="83.63341395834055" />
-      <entry key="M2" value="115.44407578467022" />
-      <entry key="M5" value="148.29876879888695" />
-      <entry key="M10" value="172.087654286662" />
-      <entry key="M15" value="188.03951908460758" />
-      <entry key="M30" value="224.54201808589949" />
-      <entry key="H1" value="313.9651272647899" />
-      <entry key="H2" value="543.2209131322869" />
-      <entry key="H4" value="877.8007770024354" />
-      <entry key="D1" value="1469.055028552903" />
-      <entry key="W1" value="1619.9723130928573" />
+      <entry key="MS100" value="0.01991503068454053" />
+      <entry key="MS500" value="0.505424144257387" />
+      <entry key="S2" value="2.5520699179877075" />
+      <entry key="S5" value="6.403652286581069" />
+      <entry key="S10" value="12.28075266931039" />
+      <entry key="S30" value="25.190982546077393" />
+      <entry key="S60" value="33.65066961752004" />
+      <entry key="M2" value="41.02269963689296" />
+      <entry key="M5" value="47.457962404791935" />
+      <entry key="M10" value="51.67934640984442" />
+      <entry key="M15" value="60.016988221177165" />
+      <entry key="M30" value="106.1879686611567" />
+      <entry key="H1" value="215.67604109596437" />
+      <entry key="H2" value="451.18119897393325" />
+      <entry key="H4" value="815.0210301190358" />
+      <entry key="D1" value="1530.0787054761001" />
+      <entry key="W1" value="1724.693139181852" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{

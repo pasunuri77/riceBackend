@@ -44,6 +44,7 @@ public class OrderService {
     private final EmailService emailService;
     private final com.rice.service.ProductAnalyticsService productAnalyticsService;
     private final UserRepository userRepository;
+    private final DeliveryService deliveryService;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
@@ -189,8 +190,16 @@ public class OrderService {
         // For offline orders, address must be null and delivery charge is 0
         if (orderType.equals("offline") && (req.getAddress() == null || req.getAddress().isBlank())) {
             // This is expected for offline
-        } else if (orderType.equals("online") && (req.getAddress() == null || req.getAddress().isBlank())) {
-            throw ApiException.badRequest("Address is required for online orders");
+        } else if (orderType.equals("online")) {
+            if (req.getAddress() == null || req.getAddress().isBlank()) {
+                throw ApiException.badRequest("Address is required for online orders");
+            }
+            if (req.getDeliveryZipCode() == null || req.getDeliveryZipCode().isBlank()) {
+                throw ApiException.badRequest("Delivery ZIP code is required for online orders");
+            }
+            if (!deliveryService.checkDelivery(req.getDeliveryZipCode()).isDeliverable()) {
+                throw ApiException.badRequest("Delivery is not available for ZIP code " + req.getDeliveryZipCode());
+            }
         }
 
         BigDecimal subtotal = req.getItems().stream()
@@ -278,6 +287,12 @@ public class OrderService {
     public OrderResponse create(User customer, OrderCreateRequest req) {
         if (req.getItems() == null || req.getItems().isEmpty()) {
             throw ApiException.badRequest("Cannot place an order with no items");
+        }
+        if (req.getDeliveryZipCode() == null || req.getDeliveryZipCode().isBlank()) {
+            throw ApiException.badRequest("Delivery ZIP code is required");
+        }
+        if (!deliveryService.checkDelivery(req.getDeliveryZipCode()).isDeliverable()) {
+            throw ApiException.badRequest("Delivery is not available for ZIP code " + req.getDeliveryZipCode());
         }
 
         BigDecimal subtotal = req.getItems().stream()

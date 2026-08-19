@@ -27,6 +27,8 @@ public class AdminOrderCreateRequest {
     
     private String address;  // required for online, ignored for offline
     
+    private String deliveryZipCode; // required for online, ignored for offline
+    
     @NotNull(message = "Payment method is required")
     private String paymentMethod;
     

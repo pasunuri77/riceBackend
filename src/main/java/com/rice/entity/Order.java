@@ -46,7 +46,8 @@ public class Order {
     @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
-    @Column(name = "order_type", nullable = false, columnDefinition = "varchar(20) default 'online'")
+    @org.hibernate.annotations.ColumnDefault("'online'")
+    @Column(name = "order_type", nullable = false, length = 20)
     @Builder.Default
     private String orderType = "online";
 

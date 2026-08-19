@@ -42,7 +42,8 @@ class OrderServiceEmailNotificationTest {
         emailService = mock(EmailService.class);
         productAnalyticsService = mock(ProductAnalyticsService.class);
         userRepository = mock(UserRepository.class);
-        service = new OrderService(orderRepository, productRepository, storeSettingsService, couponService, emailService, productAnalyticsService, userRepository);
+        DeliveryService deliveryService = mock(DeliveryService.class);
+        service = new OrderService(orderRepository, productRepository, storeSettingsService, couponService, emailService, productAnalyticsService, userRepository, deliveryService);
     }
 
     @Test

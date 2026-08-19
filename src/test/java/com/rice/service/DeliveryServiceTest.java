@@ -28,8 +28,8 @@ class DeliveryServiceTest {
 
     @Test
     void isServiceable_validUsZipAndPresent() {
-        when(repo.findByPincode("12345")).thenReturn(Optional.of(new ServiceablePincode(1L, "12345")));
-        when(repo.findByPincode("12345-6789")).thenReturn(Optional.of(new ServiceablePincode(2L, "12345-6789")));
+        when(repo.findByPincode("12345")).thenReturn(Optional.of(new ServiceablePincode(1L, "12345", null, true, false)));
+        when(repo.findByPincode("12345-6789")).thenReturn(Optional.of(new ServiceablePincode(2L, "12345", null, true, false)));
 
         assertTrue(service.isServiceable("12345"));
         assertTrue(service.isServiceable("12345-6789"));
@@ -45,7 +45,7 @@ class DeliveryServiceTest {
     @Test
     void addPincodes_savesOnlyNewValid() {
         when(repo.findByPincode("12345")).thenReturn(Optional.empty());
-        when(repo.findByPincode("12345-6789")).thenReturn(Optional.of(new ServiceablePincode(2L, "12345-6789")));
+        when(repo.findByPincode("12345-6789")).thenReturn(Optional.of(new ServiceablePincode(2L, "12345", null, true, false)));
         when(repo.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<String> added = service.addPincodes(List.of("12345", "12345-6789", "bad"));
@@ -59,16 +59,16 @@ class DeliveryServiceTest {
 
     @Test
     void removePincode_deletesWhenPresent() {
-        ServiceablePincode p = new ServiceablePincode(3L, "500003");
-        when(repo.findByPincode("500003")).thenReturn(Optional.of(p));
-        service.removePincode("500003");
+        ServiceablePincode p = new ServiceablePincode(3L, "50000", null, true, false);
+        when(repo.findByPincode("50000")).thenReturn(Optional.of(p));
+        service.removePincode("50000");
         verify(repo).delete(p);
     }
 
     @Test
     void isProductServiceable_returnsTrueOnlyWhenProductExistsAndPincodeIsServiceable() {
         when(productRepository.existsById("p123")).thenReturn(true);
-        when(repo.findByPincode("12345")).thenReturn(Optional.of(new ServiceablePincode(1L, "12345")));
+        when(repo.findByPincode("12345")).thenReturn(Optional.of(new ServiceablePincode(1L, "12345", null, true, false)));
 
         assertTrue(service.isProductServiceable("p123", "12345"));
         assertFalse(service.isProductServiceable("missing", "12345"));
