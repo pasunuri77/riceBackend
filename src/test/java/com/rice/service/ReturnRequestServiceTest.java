@@ -59,7 +59,7 @@ public class ReturnRequestServiceTest {
         order.setDeliveredAt(Instant.now().minusSeconds(86400)); // Delivered yesterday
 
         Product product1 = new Product();
-        product1.setId(1L);
+        product1.setId("p1");
 
         item10lb = new OrderItem();
         item10lb.setId(10L);
