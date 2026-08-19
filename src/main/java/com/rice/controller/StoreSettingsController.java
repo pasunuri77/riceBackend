@@ -5,6 +5,7 @@ import com.rice.dto.settings.StoreSettingsResponse;
 import com.rice.service.StoreSettingsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,11 +25,13 @@ public class StoreSettingsController {
     }
 
     @PutMapping("/api/admin/settings")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageDeliveryTax(authentication)")
     public StoreSettingsResponse put(@Valid @RequestBody StoreSettingsRequest request) {
         return storeSettingsService.update(request);
     }
 
     @PatchMapping("/api/admin/settings")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageDeliveryTax(authentication)")
     public StoreSettingsResponse patch(@Valid @RequestBody StoreSettingsRequest request) {
         return storeSettingsService.update(request);
     }

@@ -7,6 +7,7 @@ import com.rice.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -26,17 +27,20 @@ public class CouponController {
 
     @PostMapping("/admin/coupons")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageCoupons(authentication)")
     public CouponResponse create(@Valid @RequestBody CouponRequest request) {
         return couponService.create(request);
     }
 
     @PutMapping("/admin/coupons/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageCoupons(authentication)")
     public CouponResponse update(@PathVariable Long id, @Valid @RequestBody CouponRequest request) {
         return couponService.update(id, request);
     }
 
     @DeleteMapping("/admin/coupons/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageCoupons(authentication)")
     public void delete(@PathVariable Long id) {
         couponService.delete(id);
     }
