@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Builder
 public class ReturnableItemDto {
     private Long orderItemId;
-    private Long productId;
+    private String productId;
     private String productName;
     private String variantName;
     private BigDecimal unitPrice;
