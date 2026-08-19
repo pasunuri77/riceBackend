@@ -9,6 +9,7 @@ import com.rice.security.AppUserPrincipal;
 import com.rice.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -40,31 +41,37 @@ public class OrderController {
     }
 
     @GetMapping("/api/admin/orders")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageOrders(authentication)")
     public List<OrderResponse> all() {
         return orderService.listAll();
     }
 
     @PatchMapping("/api/admin/orders/{id}/confirm")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageOrders(authentication)")
     public OrderResponse confirmOrder(@PathVariable String id) {
         return orderService.confirmOrder(id);
     }
 
     @PostMapping("/api/admin/orders")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageOrders(authentication)")
     public OrderResponse createAdminOrder(@Valid @RequestBody AdminOrderCreateRequest request) {
         return orderService.createAdminOrder(request);
     }
 
     @PatchMapping("/api/admin/orders/{id}/payment-status")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageOrders(authentication)")
     public OrderResponse updatePaymentStatus(@PathVariable String id, @Valid @RequestBody UpdateOrderStatusRequest request) {
         return orderService.updatePaymentStatus(id, request.getStatus());
     }
 
     @PatchMapping("/api/admin/orders/{id}/delivery-status")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageOrders(authentication)")
     public OrderResponse updateDeliveryStatus(@PathVariable String id, @Valid @RequestBody UpdateOrderStatusRequest request) {
         return orderService.updateDeliveryStatus(id, request.getStatus());
     }
 
     @PatchMapping("/api/admin/orders/{id}/delivery-info")
+    @PreAuthorize("hasRole('ADMIN') or @permCheck.canManageOrders(authentication)")
     public OrderResponse updateDeliveryInfo(@PathVariable String id, @Valid @RequestBody UpdateOrderDeliveryInfoRequest request) {
         return orderService.updateDeliveryInfo(id, request);
     }

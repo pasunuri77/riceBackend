@@ -3,6 +3,7 @@ package com.rice.exception;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,6 +39,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+    }
+
+    // Thrown by @PreAuthorize when an authenticated user (e.g. an employee
+    // lacking a specific permission) is correctly identified but not allowed
+    // to do this one thing - distinct from "not logged in at all" (401,
+    // handled by the authenticationEntryPoint in SecurityConfig). Without this
+    // handler it fell through to the generic 500 handler below, which is wrong
+    // (a permission denial isn't a server error) and unnecessarily alarming.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        return build(HttpStatus.FORBIDDEN, "You don't have permission to do this", null);
     }
 
     @ExceptionHandler(Exception.class)

@@ -188,6 +188,7 @@ public class StaffService {
 
         // Admin can delete any account
         if (caller.getRole() == Role.ADMIN) {
+            deleteEmployeePermissionsIfAny(target);
             userRepository.delete(target);
             return;
         }
@@ -224,6 +225,7 @@ public class StaffService {
 
         // Admin can delete any staff (another admin or employee)
         if (caller.getRole() == Role.ADMIN) {
+            deleteEmployeePermissionsIfAny(target);
             userRepository.delete(target);
             return;
         }
@@ -235,6 +237,17 @@ public class StaffService {
 
         // Regular user cannot delete staff
         throw ApiException.forbidden("You do not have permission to delete staff accounts");
+    }
+
+    // An employee row always has a corresponding EmployeePermission row (created
+    // at invite time / on promotion), and that row's FK back to users has no
+    // cascade - deleting the user first violates the constraint. Delete the
+    // permission row first, when present, so the user delete that follows can
+    // actually succeed.
+    private void deleteEmployeePermissionsIfAny(User target) {
+        if (target.getRole() == Role.EMPLOYEE) {
+            permissionRepository.findByEmployeeId(target.getId()).ifPresent(permissionRepository::delete);
+        }
     }
 
     private StaffResponse toResponse(User user) {

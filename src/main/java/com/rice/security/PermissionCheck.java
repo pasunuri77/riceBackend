@@ -44,6 +44,15 @@ public class PermissionCheck {
         return checkPermission(authentication, "canManageDeliveryTax");
     }
 
+    // No payments endpoint exists yet (the admin/user Payments pages still derive
+    // everything from Order fields client-side) - this is here so the permission
+    // model is already complete and ready the moment a real payments controller
+    // needs it, matching the `canManagePayments` key already present on the
+    // frontend's EmployeePermission shape.
+    public boolean canManagePayments(Authentication authentication) {
+        return checkPermission(authentication, "canManagePayments");
+    }
+
     private boolean checkPermission(Authentication authentication, String permission) {
         if (authentication == null || !(authentication.getPrincipal() instanceof AppUserPrincipal)) {
             return false;
