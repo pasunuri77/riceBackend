@@ -80,6 +80,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/brands/**", "/api/settings").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/coupons", "/api/banners").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/coupons/validate").permitAll()
+                        // Store location, delivery areas, and the zip-check widget are all shown
+                        // on the public Home page before a visitor ever logs in - without this
+                        // they fell through to the anyRequest().authenticated() rule below and
+                        // 401'd for every anonymous visitor, which is what "Delivery coverage is
+                        // temporarily unavailable" / "Store location is temporarily unavailable"
+                        // on the homepage actually was.
+                        .requestMatchers(HttpMethod.GET, "/api/delivery/store", "/api/delivery/areas", "/api/delivery/check").permitAll()
                         // Staff management (inviting/editing/deleting other admin & employee
                         // accounts, and their permission grants) is ADMIN-only, full stop - an
                         // employee is never allowed to manage other staff regardless of any
