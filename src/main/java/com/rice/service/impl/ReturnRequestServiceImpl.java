@@ -73,6 +73,7 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
 
         return ReturnableItemsResponseDto.builder()
                 .orderId(order.getId())
+                .orderDisplayId(displayId(order))
                 .paymentMethod(order.getPaymentMethod())
                 .paymentProvider(order.getPaymentProvider())
                 .paymentDisplay(order.getPaymentDisplay())
@@ -250,6 +251,56 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
         return mapToResponseDto(returnRequestRepository.save(request));
     }
 
+    @Override
+    @Transactional
+    public ReturnRequestResponseDto receiveReturnItems(Long id, ReceiveReturnDto dto) {
+        ReturnRequest request = returnRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Return request not found"));
+
+        if (request.getStatus() != ReturnRequestStatus.APPROVED) {
+            throw new RuntimeException("Return request must be approved before items can be received");
+        }
+
+        request.setStatus(ReturnRequestStatus.RECEIVED);
+        request.setReceivedAt(Instant.now());
+        request.setReceivedCondition(dto.getReceivedCondition());
+        request.setReceivedNote(dto.getReceivedNote());
+
+        return mapToResponseDto(returnRequestRepository.save(request));
+    }
+
+    @Override
+    @Transactional
+    public ReturnRequestResponseDto processRefund(Long id, ProcessRefundDto dto) {
+        ReturnRequest request = returnRequestRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Return request not found"));
+
+        if (request.getStatus() != ReturnRequestStatus.RECEIVED) {
+            throw new RuntimeException("Return items must be received before refund can be processed");
+        }
+
+        request.setStatus(ReturnRequestStatus.REFUNDED);
+        request.setRefundProcessedAt(Instant.now());
+        request.setRefundReference(dto.getRefundReference());
+        request.setRefundNote(dto.getRefundNote());
+
+        Refund refund = refundRepository.findByReturnRequestId(id)
+                .orElseGet(() -> Refund.builder()
+                        .returnRequest(request)
+                        .order(request.getOrder())
+                        .paymentMethod(request.getRefundMethod())
+                        .amount(request.getRefundAmount())
+                        .status(RefundStatus.PENDING)
+                        .build());
+        refund.setPaymentReference(dto.getRefundReference());
+        refund.setAmount(request.getRefundAmount());
+        refund.setStatus(RefundStatus.COMPLETED);
+        refund.setProcessedAt(request.getRefundProcessedAt());
+        refundRepository.save(refund);
+
+        return mapToResponseDto(returnRequestRepository.save(request));
+    }
+
     private int getReturnedQuantity(Long orderItemId) {
         List<ReturnRequestItem> returnItems = returnRequestItemRepository.findActiveReturnsByOrderItemId(orderItemId);
         return returnItems.stream()
@@ -275,12 +326,17 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
                 .id(entity.getId())
                 .returnNumber(entity.getReturnNumber())
                 .orderId(entity.getOrder().getId())
+                .orderDisplayId(displayId(entity.getOrder()))
                 .customerId(entity.getCustomer().getId())
+                .customerName(entity.getCustomer().getName())
                 .status(entity.getStatus())
                 .reason(entity.getReason())
                 .customerDetails(entity.getCustomerDetails())
                 .refundMethod(entity.getRefundMethod())
                 .refundAmount(entity.getRefundAmount())
+                .paymentDisplay(entity.getOrder().getPaymentDisplay())
+                .orderDate(entity.getOrder().getCreatedAt())
+                .deliveredAt(entity.getOrder().getDeliveredAt())
                 .adminReason(entity.getAdminReason())
                 .adminNote(entity.getAdminNote())
                 .returnInstructions(entity.getReturnInstructions())
@@ -289,7 +345,18 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
                 .approvedAt(entity.getApprovedAt())
                 .rejectedAt(entity.getRejectedAt())
                 .refundProcessedAt(entity.getRefundProcessedAt())
+                .receivedAt(entity.getReceivedAt())
+                .receivedCondition(entity.getReceivedCondition())
+                .receivedNote(entity.getReceivedNote())
+                .refundReference(entity.getRefundReference())
+                .refundNote(entity.getRefundNote())
                 .items(itemDtos)
                 .build();
+    }
+
+    private String displayId(Order order) {
+        String prefix = "offline".equalsIgnoreCase(order.getOrderType()) ? "OFF-" : "RBZ-";
+        int year = order.getCreatedAt() != null ? order.getCreatedAt().atZone(java.time.ZoneOffset.UTC).getYear() : java.time.Year.now().getValue();
+        return prefix + year + "-" + (10000 + order.getId());
     }
 }

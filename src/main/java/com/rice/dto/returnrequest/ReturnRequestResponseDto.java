@@ -15,12 +15,17 @@ public class ReturnRequestResponseDto {
     private Long id;
     private String returnNumber;
     private Long orderId;
+    private String orderDisplayId;
     private Long customerId;
+    private String customerName;
     private ReturnRequestStatus status;
     private String reason;
     private String customerDetails;
     private RefundMethod refundMethod;
     private BigDecimal refundAmount;
+    private String paymentDisplay;
+    private Instant orderDate;
+    private Instant deliveredAt;
     private String adminReason;
     private String adminNote;
     private String returnInstructions;
@@ -29,6 +34,11 @@ public class ReturnRequestResponseDto {
     private Instant approvedAt;
     private Instant rejectedAt;
     private Instant refundProcessedAt;
+    private Instant receivedAt;
+    private String receivedCondition;
+    private String receivedNote;
+    private String refundReference;
+    private String refundNote;
     
     private List<ReturnItemResponseDto> items;
 }

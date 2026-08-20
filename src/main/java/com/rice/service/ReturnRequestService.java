@@ -21,4 +21,8 @@ public interface ReturnRequestService {
     ReturnRequestResponseDto approveReturnRequest(Long id, ApproveReturnDto dto);
     
     ReturnRequestResponseDto rejectReturnRequest(Long id, RejectReturnDto dto);
+
+    ReturnRequestResponseDto receiveReturnItems(Long id, ReceiveReturnDto dto);
+
+    ReturnRequestResponseDto processRefund(Long id, ProcessRefundDto dto);
 }

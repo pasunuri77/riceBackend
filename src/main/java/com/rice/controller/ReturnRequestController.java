@@ -3,7 +3,7 @@ package com.rice.controller;
 import com.rice.dto.returnrequest.ReturnRequestResponseDto;
 import com.rice.dto.returnrequest.ReturnRequestSubmissionDto;
 import com.rice.dto.returnrequest.ReturnableItemsResponseDto;
-import com.rice.entity.User;
+import com.rice.security.AppUserPrincipal;
 import com.rice.service.ReturnRequestService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,17 +26,17 @@ public class ReturnRequestController {
     @GetMapping("/orders/{orderId}/returnable-items")
     public ResponseEntity<ReturnableItemsResponseDto> getReturnableItems(
             @PathVariable Long orderId,
-            @AuthenticationPrincipal User user) {
-        ReturnableItemsResponseDto response = returnRequestService.getReturnableItems(orderId, user.getId());
+            @AuthenticationPrincipal AppUserPrincipal principal) {
+        ReturnableItemsResponseDto response = returnRequestService.getReturnableItems(orderId, principal.getUser().getId());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/return-requests")
     public ResponseEntity<?> submitReturnRequest(
             @Valid @RequestBody ReturnRequestSubmissionDto dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal AppUserPrincipal principal) {
         try {
-            ReturnRequestResponseDto response = returnRequestService.submitReturnRequest(dto, user);
+            ReturnRequestResponseDto response = returnRequestService.submitReturnRequest(dto, principal.getUser());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException ex) {
             if (ex.getMessage().contains("quantity exceeds") || ex.getMessage().contains("expired")) {
@@ -51,17 +51,17 @@ public class ReturnRequestController {
 
     @GetMapping("/me/return-requests")
     public ResponseEntity<List<ReturnRequestResponseDto>> getMyReturnRequests(
-            @AuthenticationPrincipal User user) {
-        List<ReturnRequestResponseDto> response = returnRequestService.getCustomerReturnRequests(user.getId());
+            @AuthenticationPrincipal AppUserPrincipal principal) {
+        List<ReturnRequestResponseDto> response = returnRequestService.getCustomerReturnRequests(principal.getUser().getId());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/return-requests/{id}")
     public ResponseEntity<ReturnRequestResponseDto> getReturnRequest(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal AppUserPrincipal principal) {
         try {
-            ReturnRequestResponseDto response = returnRequestService.getReturnRequestByIdForCustomer(id, user.getId());
+            ReturnRequestResponseDto response = returnRequestService.getReturnRequestByIdForCustomer(id, principal.getUser().getId());
             return ResponseEntity.ok(response);
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();

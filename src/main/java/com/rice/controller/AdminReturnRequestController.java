@@ -1,6 +1,8 @@
 package com.rice.controller;
 
 import com.rice.dto.returnrequest.ApproveReturnDto;
+import com.rice.dto.returnrequest.ProcessRefundDto;
+import com.rice.dto.returnrequest.ReceiveReturnDto;
 import com.rice.dto.returnrequest.RejectReturnDto;
 import com.rice.dto.returnrequest.ReturnRequestResponseDto;
 import com.rice.service.ReturnRequestService;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/return-requests")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN') or @permCheck.canManageOrders(authentication)")
 public class AdminReturnRequestController {
 
     private final ReturnRequestService returnRequestService;
@@ -57,6 +59,30 @@ public class AdminReturnRequestController {
             @Valid @RequestBody RejectReturnDto dto) {
         try {
             ReturnRequestResponseDto response = returnRequestService.rejectReturnRequest(id, dto);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/receive")
+    public ResponseEntity<?> receiveReturnItems(
+            @PathVariable Long id,
+            @Valid @RequestBody ReceiveReturnDto dto) {
+        try {
+            ReturnRequestResponseDto response = returnRequestService.receiveReturnItems(id, dto);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/refund")
+    public ResponseEntity<?> processRefund(
+            @PathVariable Long id,
+            @Valid @RequestBody ProcessRefundDto dto) {
+        try {
+            ReturnRequestResponseDto response = returnRequestService.processRefund(id, dto);
             return ResponseEntity.ok(response);
         } catch (RuntimeException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());

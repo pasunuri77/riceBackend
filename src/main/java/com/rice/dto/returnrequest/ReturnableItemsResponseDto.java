@@ -10,6 +10,7 @@ import java.util.List;
 @Builder
 public class ReturnableItemsResponseDto {
     private Long orderId;
+    private String orderDisplayId;
     private PaymentMethod paymentMethod;
     private String paymentProvider;
     private String paymentDisplay;

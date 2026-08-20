@@ -13,6 +13,6 @@ public interface ReturnRequestItemRepository extends JpaRepository<ReturnRequest
     
     @Query("SELECT rri FROM ReturnRequestItem rri JOIN rri.returnRequest rr " +
            "WHERE rri.orderItem.id = :orderItemId " +
-           "AND rr.status IN ('PENDING', 'APPROVED')")
+           "AND rr.status IN ('PENDING', 'APPROVED', 'RECEIVED', 'REFUNDED')")
     List<ReturnRequestItem> findActiveReturnsByOrderItemId(@Param("orderItemId") Long orderItemId);
 }

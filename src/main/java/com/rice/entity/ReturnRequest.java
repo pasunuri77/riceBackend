@@ -78,6 +78,21 @@ public class ReturnRequest {
     @Column(name = "refund_processed_at")
     private Instant refundProcessedAt;
 
+    @Column(name = "received_at")
+    private Instant receivedAt;
+
+    @Column(name = "received_condition")
+    private String receivedCondition;
+
+    @Column(name = "received_note", columnDefinition = "text")
+    private String receivedNote;
+
+    @Column(name = "refund_reference")
+    private String refundReference;
+
+    @Column(name = "refund_note", columnDefinition = "text")
+    private String refundNote;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private Instant createdAt = Instant.now();
