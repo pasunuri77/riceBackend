@@ -32,6 +32,9 @@ public class ServiceablePincode {
     @Column(name = "is_named_zone", nullable = false)
     @Builder.Default
     private boolean isNamedZone = false;
+
+    @Column(name = "city")
+    private String city;
     
     // For backward compatibility constructors
     public ServiceablePincode(Long id, String pincode) {
@@ -39,5 +42,15 @@ public class ServiceablePincode {
         this.pincode = pincode;
         this.active = true;
         this.isNamedZone = false;
+        this.city = null;
+    }
+
+    public ServiceablePincode(Long id, String pincode, DeliveryZone zone, boolean active, boolean isNamedZone) {
+        this.id = id;
+        this.pincode = pincode;
+        this.zone = zone;
+        this.active = active;
+        this.isNamedZone = isNamedZone;
+        this.city = null;
     }
 }

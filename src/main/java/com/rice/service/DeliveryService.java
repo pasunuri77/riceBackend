@@ -1,6 +1,7 @@
 package com.rice.service;
 
 import com.rice.dto.delivery.DeliveryAreaResponse;
+import com.rice.dto.delivery.PincodeDto;
 import com.rice.dto.delivery.ServiceabilityResponse;
 import com.rice.dto.delivery.StoreLocationResponse;
 import com.rice.entity.DeliveryZone;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,13 +90,19 @@ public class DeliveryService {
                 .toList();
 
         Map<Long, List<String>> zoneToZips = new HashMap<>();
+        Map<String, List<String>> cityToZips = new LinkedHashMap<>();
         List<String> greaterAustinZips = new ArrayList<>();
 
         for (ServiceablePincode sp : allActivePincodes) {
             if (sp.getZone() != null) {
                 zoneToZips.computeIfAbsent(sp.getZone().getId(), k -> new ArrayList<>()).add(sp.getPincode());
             } else if (!sp.isNamedZone()) {
-                greaterAustinZips.add(sp.getPincode());
+                if (sp.getCity() != null && !sp.getCity().trim().isEmpty()) {
+                    String cityName = sp.getCity().trim();
+                    cityToZips.computeIfAbsent(cityName, k -> new ArrayList<>()).add(sp.getPincode());
+                } else {
+                    greaterAustinZips.add(sp.getPincode());
+                }
             }
         }
 
@@ -105,6 +113,17 @@ public class DeliveryService {
                     .description(zone.getDescription())
                     .zipCodes(zoneToZips.getOrDefault(zone.getId(), new ArrayList<>()))
                     .isNamedZone(true)
+                    .build());
+        }
+
+        long syntheticCityId = 1000L;
+        for (Map.Entry<String, List<String>> entry : cityToZips.entrySet()) {
+            responses.add(DeliveryAreaResponse.builder()
+                    .id(syntheticCityId++)
+                    .name(entry.getKey())
+                    .description(null)
+                    .zipCodes(entry.getValue())
+                    .isNamedZone(false)
                     .build());
         }
 
@@ -180,20 +199,58 @@ public class DeliveryService {
         return repo.findAll().stream().map(p -> p.getPincode()).toList();
     }
 
+    public List<PincodeDto> listPincodeDetails() {
+        return repo.findAll().stream()
+                .map(p -> new PincodeDto(p.getPincode(), p.getCity()))
+                .toList();
+    }
+
     public List<String> addPincodes(List<String> pincodes) {
+        return addPincodesWithCity(pincodes, null).stream().map(PincodeDto::getPincode).toList();
+    }
+
+    public List<PincodeDto> addPincodesWithCity(List<String> pincodes, String city) {
         if (pincodes == null || pincodes.isEmpty()) return List.of();
+        List<PincodeDto> items = pincodes.stream()
+                .filter(p -> p != null)
+                .map(p -> new PincodeDto(p, city))
+                .toList();
+        return addPincodeItems(items);
+    }
+
+    public List<PincodeDto> addPincodeItems(List<PincodeDto> items) {
+        if (items == null || items.isEmpty()) return List.of();
         List<ServiceablePincode> toSave = new ArrayList<>();
-        for (String p : pincodes) {
-            if (p == null) continue;
-            String n = p.trim();
+        List<PincodeDto> result = new ArrayList<>();
+        for (PincodeDto item : items) {
+            if (item == null || item.getPincode() == null) continue;
+            String n = item.getPincode().trim();
             if (!ZIP_PATTERN.matcher(n).matches()) continue;
-            boolean exists = repo.findByPincode(n).isPresent();
-            if (!exists) {
-                toSave.add(ServiceablePincode.builder().pincode(n).active(true).isNamedZone(false).build());
+            String c = (item.getCity() != null && !item.getCity().trim().isEmpty()) ? item.getCity().trim() : null;
+
+            Optional<ServiceablePincode> existingOpt = repo.findByPincode(n);
+            if (existingOpt.isPresent()) {
+                ServiceablePincode sp = existingOpt.get();
+                if (c != null) {
+                    sp.setCity(c);
+                    toSave.add(sp);
+                    result.add(new PincodeDto(sp.getPincode(), sp.getCity()));
+                }
+            } else {
+                ServiceablePincode sp = ServiceablePincode.builder()
+                        .pincode(n)
+                        .city(c)
+                        .active(true)
+                        .isNamedZone(false)
+                        .build();
+                toSave.add(sp);
+                result.add(new PincodeDto(sp.getPincode(), sp.getCity()));
             }
         }
-        if (toSave.isEmpty()) return List.of();
-        return repo.saveAll(toSave).stream().map(s -> s.getPincode()).toList();
+        if (!toSave.isEmpty()) {
+            repo.saveAll(toSave);
+        }
+        return result;
     }
 
     public void removePincode(String pincode) {

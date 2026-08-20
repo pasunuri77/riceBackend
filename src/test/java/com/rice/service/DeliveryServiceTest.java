@@ -1,6 +1,10 @@
 package com.rice.service;
 
+import com.rice.dto.delivery.DeliveryAreaResponse;
+import com.rice.dto.delivery.PincodeDto;
+import com.rice.entity.DeliveryZone;
 import com.rice.entity.ServiceablePincode;
+import com.rice.repository.DeliveryZoneRepository;
 import com.rice.repository.ProductRepository;
 import com.rice.repository.ServiceablePincodeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,13 +21,15 @@ class DeliveryServiceTest {
 
     private ServiceablePincodeRepository repo;
     private ProductRepository productRepository;
+    private DeliveryZoneRepository deliveryZoneRepository;
     private DeliveryService service;
 
     @BeforeEach
     void setUp() {
         repo = mock(ServiceablePincodeRepository.class);
         productRepository = mock(ProductRepository.class);
-        service = new DeliveryService(repo, productRepository);
+        deliveryZoneRepository = mock(DeliveryZoneRepository.class);
+        service = new DeliveryService(repo, productRepository, null, null, deliveryZoneRepository);
     }
 
     @Test
@@ -72,5 +78,59 @@ class DeliveryServiceTest {
 
         assertTrue(service.isProductServiceable("p123", "12345"));
         assertFalse(service.isProductServiceable("missing", "12345"));
+    }
+
+    @Test
+    void getDeliveryAreas_groupsByCityAndLeftoverGreaterAustin() {
+        DeliveryZone dz1 = DeliveryZone.builder().id(1L).name("Downtown Austin").description("Downtown").active(true).build();
+        when(deliveryZoneRepository.findByActiveTrue()).thenReturn(List.of(dz1));
+
+        ServiceablePincode p1 = ServiceablePincode.builder().id(1L).pincode("78701").zone(dz1).active(true).isNamedZone(true).build();
+        ServiceablePincode p2 = ServiceablePincode.builder().id(2L).pincode("78664").city("Round Rock").active(true).isNamedZone(false).build();
+        ServiceablePincode p3 = ServiceablePincode.builder().id(3L).pincode("78665").city("Round Rock").active(true).isNamedZone(false).build();
+        ServiceablePincode p4 = ServiceablePincode.builder().id(4L).pincode("78660").city("Pflugerville").active(true).isNamedZone(false).build();
+        ServiceablePincode p5 = ServiceablePincode.builder().id(5L).pincode("78721").city(null).active(true).isNamedZone(false).build();
+
+        when(repo.findAll()).thenReturn(List.of(p1, p2, p3, p4, p5));
+
+        List<DeliveryAreaResponse> areas = service.getDeliveryAreas();
+        assertEquals(4, areas.size());
+
+        // Named zone
+        assertEquals("Downtown Austin", areas.get(0).getName());
+        assertTrue(areas.get(0).isNamedZone());
+        assertEquals(List.of("78701"), areas.get(0).getZipCodes());
+
+        // Cities
+        assertEquals("Round Rock", areas.get(1).getName());
+        assertFalse(areas.get(1).isNamedZone());
+        assertEquals(List.of("78664", "78665"), areas.get(1).getZipCodes());
+
+        assertEquals("Pflugerville", areas.get(2).getName());
+        assertFalse(areas.get(2).isNamedZone());
+        assertEquals(List.of("78660"), areas.get(2).getZipCodes());
+
+        // Leftover Greater Austin
+        assertEquals("Greater Austin", areas.get(3).getName());
+        assertEquals(999L, areas.get(3).getId());
+        assertFalse(areas.get(3).isNamedZone());
+        assertEquals(List.of("78721"), areas.get(3).getZipCodes());
+    }
+
+    @Test
+    void addPincodeItems_updatesExistingAndAddsNewWithCity() {
+        ServiceablePincode existing = ServiceablePincode.builder().id(10L).pincode("78664").city(null).active(true).build();
+        when(repo.findByPincode("78664")).thenReturn(Optional.of(existing));
+        when(repo.findByPincode("78665")).thenReturn(Optional.empty());
+        when(repo.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
+
+        List<PincodeDto> result = service.addPincodeItems(List.of(
+                new PincodeDto("78664", "Round Rock"),
+                new PincodeDto("78665", "Round Rock")
+        ));
+
+        assertEquals(2, result.size());
+        assertEquals("Round Rock", result.get(0).getCity());
+        assertEquals("Round Rock", result.get(1).getCity());
     }
 }

@@ -151,7 +151,8 @@ ON CONFLICT (id) DO NOTHING;
 ALTER TABLE serviceable_pincodes
     ADD COLUMN IF NOT EXISTS zone_id bigint,
     ADD COLUMN IF NOT EXISTS active boolean not null default true,
-    ADD COLUMN IF NOT EXISTS is_named_zone boolean not null default false;
+    ADD COLUMN IF NOT EXISTS is_named_zone boolean not null default false,
+    ADD COLUMN IF NOT EXISTS city varchar(255);
 
 ALTER TABLE serviceable_pincodes
     DROP CONSTRAINT IF EXISTS fk_sp_zone;
@@ -171,6 +172,17 @@ VALUES
     ('78640', true, false),
     ('78610', true, false)
 ON CONFLICT (pincode) DO NOTHING;
+
+-- Seed city names for Greater Austin pincodes
+UPDATE serviceable_pincodes SET city = 'Round Rock' WHERE pincode IN ('78664', '78665', '78681');
+UPDATE serviceable_pincodes SET city = 'Cedar Park' WHERE pincode IN ('78613', '78630');
+UPDATE serviceable_pincodes SET city = 'Pflugerville' WHERE pincode IN ('78660');
+UPDATE serviceable_pincodes SET city = 'Georgetown' WHERE pincode IN ('78626', '78628', '78633');
+UPDATE serviceable_pincodes SET city = 'San Marcos' WHERE pincode IN ('78666');
+UPDATE serviceable_pincodes SET city = 'Leander' WHERE pincode IN ('78641');
+UPDATE serviceable_pincodes SET city = 'Kyle' WHERE pincode IN ('78640');
+UPDATE serviceable_pincodes SET city = 'Buda' WHERE pincode IN ('78610');
+UPDATE serviceable_pincodes SET city = 'Austin' WHERE pincode LIKE '787%' AND city IS NULL;
 
 -- Map named zones
 UPDATE serviceable_pincodes SET zone_id = 1, is_named_zone = true WHERE pincode = '78701';
